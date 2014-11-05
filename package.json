@@ -1,0 +1,25 @@
+{
+    "name": "generic-tree.js",
+    "version": "1.0.0",
+    "description": "generic tree data structure",
+    "main": "generic-tree.js",
+    "scripts": {
+        "test": "gulp test"
+    },
+    "repository": {
+        "type": "git",
+        "url": "http://github.com/arnellebalane/generic-tree.js"
+    },
+    "author": "Arnelle Balane <arnellebalane@gmail.com>",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/arnellebalane/generic-tree.js/issues"
+    },
+    "homepage": "https://github.com/arnellebalane/generic-tree.js",
+    "dependencies": {
+        "gulp": "*",
+        "gulp-jshint": "*",
+        "jshint-stylish": "*",
+        "gulp-mocha": "*"
+    }
+}
