@@ -3,9 +3,9 @@ var jshint = require('gulp-jshint');
 var stylish = require('jshint-stylish');
 
 gulp.task('jshint', function() {
-    gulp.src('**/*.js')
+    gulp.src(['Gulpfile.js', 'generic-tree.js'])
         .pipe(jshint())
-        .pipe(jshint.reporter(stylish()))
+        .pipe(jshint.reporter(stylish))
         .pipe(jshint.reporter('fail'));
 });
 
