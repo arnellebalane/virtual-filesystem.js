@@ -2,7 +2,6 @@
     "name": "generic-tree.js",
     "version": "1.0.0",
     "description": "generic tree data structure",
-    "main": "generic-tree.js",
     "scripts": {
         "test": "gulp test"
     },
@@ -13,9 +12,9 @@
     "author": "Arnelle Balane <arnellebalane@gmail.com>",
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/arnellebalane/generic-tree.js/issues"
+        "url": "https://github.com/arnellebalane/virtual-filesystem.js/issues"
     },
-    "homepage": "https://github.com/arnellebalane/generic-tree.js",
+    "homepage": "https://github.com/arnellebalane/virtual-filesystem.js",
     "dependencies": {
         "gulp": "*",
         "gulp-jshint": "*",
