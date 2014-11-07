@@ -19,7 +19,7 @@
                 throw new Error('Parent node not found.');
             } else {
                 parent[0].insert(node);
-            } 
+            }
             return node;
         };
 
@@ -68,6 +68,15 @@
                 results = results.concat(this.children[i].search(key));
             }
             return results;
+        };
+
+        this.find = function(key) {
+            for (var i in this.children) {
+                if (key === this.children[i].key) {
+                    return this.children[i];
+                }
+            }
+            return null;
         };
     }
 
