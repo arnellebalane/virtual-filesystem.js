@@ -16,6 +16,17 @@
             this.tree.insert(name, parent, { type: 'directory' });
         };
 
+        this.rmdir = function(path) {
+            path = path.replace(/\/$/g, '');
+            if (!path.length) {
+                throw new Error('You cannot delete the root directory.');
+            }
+            var parent = this._resolve_path(path);
+            var name = path.split('/').pop();
+            var node = parent.find(name);
+            this.tree.delete(node);
+        };
+
         this._resolve_path = function(path) {
             path = path.split('/');
             var parent = path[0].length ? this.pointer : this.tree.root;
