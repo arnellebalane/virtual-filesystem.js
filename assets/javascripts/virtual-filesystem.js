@@ -5,7 +5,7 @@
         root.VirtualFilesystem = library(root.GenericTree);
     }
 })(this, function(GenericTree) {
-    function VirtualFilesystem() {
+    function VirtualFileSystem() {
         this.tree = new GenericTree();
         this.tree.insert('');
         this.pointer = this.tree.root;
@@ -50,5 +50,5 @@
         };
     }
 
-    return VirtualFilesystem;
+    return VirtualFileSystem;
 });
