@@ -20,11 +20,20 @@
 
         this.rmdir = function(path) {
             path = path.replace(/\/+$/g, '');
-            if (!path.length) {
+            var node = this._resolve_path(path);
+            if (node === this.tree.root) {
                 throw new Error('You cannot delete the root directory.');
             }
-            var node = this._resolve_path(path);
             this.tree.delete(node);
+            var current_path = this._absolute_path(this.pointer);
+            var node_path = this._absolute_path(node);
+            if (node_path.match('^' + current_path) && current_path.length) {
+                this.pointer = node.parent;
+            }
+        };
+
+        this.cd = function(path) {
+            this.pointer = this._resolve_path(path);
         };
 
         this._resolve_path = function(path) {
@@ -44,6 +53,15 @@
                 }
             }
             return parent;
+        };
+
+        this._absolute_path = function(node) {
+            var path = [];
+            while (node !== null) {
+                path.unshift(node.key);
+                node = node.parent;
+            }
+            return path.join('/');
         };
     }
 
