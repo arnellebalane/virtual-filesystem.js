@@ -23,10 +23,7 @@
             if (!path.length) {
                 throw new Error('You cannot delete the root directory.');
             }
-            var segments = path.split('/');
-            var parent = this._resolve_path(segments.slice(0, segments.length - 1).join('/'));
-            var name = segments[segments.length - 1];
-            var node = parent.find(name);
+            var node = this._resolve_path(path);
             this.tree.delete(node);
         };
 
