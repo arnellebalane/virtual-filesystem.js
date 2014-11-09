@@ -38,6 +38,7 @@
             this.pointer = this._resolve_path(path);
         };
 
+        // @todo: prevent creation of files with the same name in the same location
         this.cat = function(mode, path, contents) {
             var segments = path.replace(/\/+$/g, '').split('/');
             var parent = this._resolve_path(segments.slice(0, segments.length - 1).join('/'));
@@ -62,6 +63,18 @@
                 throw new Error('"' + node.key + '" is not a file.');
             }
             this.tree.delete(node);
+        };
+
+        this.rn = function(path, name) {
+            var node = this._resolve_path(path);
+            if (node === this.tree.root) {
+                throw new Error('You cannot rename the root directory.');
+            }
+            var search = node.parent.find(name);
+            if (search && search.type === node.type) {
+                throw new Error('Rename failed. Name already taken.');
+            }
+            node.key = name;
         };
 
         this._resolve_path = function(path) {
