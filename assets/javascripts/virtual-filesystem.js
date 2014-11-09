@@ -5,22 +5,22 @@
         root.VirtualFilesystem = library(root.GenericTree);
     }
 })(this, function(GenericTree) {
+    // @todo: make this extend EventTarget
     function VirtualFileSystem() {
         this.tree = new GenericTree();
         this.tree.insert('');
         this.pointer = this.tree.root;
 
+        // @todo: prevent creation of directories with the same name in the same location
         this.mkdir = function(path) {
-            path = path.replace(/\/+$/g, '');
-            var segments = path.split('/');
+            var segments = path.replace(/\/+$/g, '').split('/');
             var parent = this._resolve_path(segments.slice(0, segments.length - 1).join('/'));
             var name = segments[segments.length - 1];
             this.tree.insert(name, parent, { type: 'directory' });
         };
 
         this.rmdir = function(path) {
-            path = path.replace(/\/+$/g, '');
-            var node = this._resolve_path(path);
+            var node = this._resolve_path(path.replace(/\/+$/g, ''));
             if (node === this.tree.root) {
                 throw new Error('You cannot delete the root directory.');
             }
@@ -36,7 +36,26 @@
             this.pointer = this._resolve_path(path);
         };
 
+        this.cat = function(mode, path, contents) {
+            var segments = path.replace(/\/+$/g, '').split('/');
+            var parent = this._resolve_path(segments.slice(0, segments.length - 1).join('/'));
+            var name = segments[segments.length - 1];
+            var node = parent.find(name);
+            if (mode.length) {
+                if (node === null) {
+                    node = this.tree.insert(name, parent, { type: 'file', contents: '' });
+                }
+                node.contents = mode === '>' ? contents : node.contents + contents;
+            } else {
+                if (node === null) {
+                    throw new Error('File not found: ' + path);
+                }
+                return node.contents;
+            }
+        };
+
         this._resolve_path = function(path) {
+            path = path.match('^\/') ? path : './' + path;
             path = path.split('/');
             var parent = path[0].length ? this.pointer : this.tree.root;
             for (var i = !path[0].length ? 1 : 0; i < path.length; i++) {
@@ -48,7 +67,7 @@
                 } else if (path[i] !== '.' && path[i].length) {
                     parent = parent.find(path[i]);
                     if (parent === null) {
-                        throw new Error('Path does not exists: ' + path.slice(0, i + 1).join('/'));
+                        throw new Error('Path not found: ' + path.slice(0, i + 1).join('/'));
                     }
                 }
             }
