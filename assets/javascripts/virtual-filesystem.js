@@ -19,6 +19,7 @@
             this.tree.insert(name, parent, { type: 'directory' });
         };
 
+        // @todo: only delete node if it is a directory
         this.rmdir = function(path) {
             var node = this._resolve_path(path.replace(/\/+$/g, ''));
             if (node === this.tree.root) {
@@ -52,6 +53,14 @@
                 }
                 return node.contents;
             }
+        };
+
+        this.rm = function(path) {
+            var node = this._resolve_path(path.replace(/\/+$/g, ''));
+            if (node.type !== 'file') {
+                throw new Error('"' + node.key + '" is not a file.');
+            }
+            this.tree.delete(node);
         };
 
         this._resolve_path = function(path) {
