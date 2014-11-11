@@ -5,10 +5,5 @@
     "noempty": true,
     "undef": true,
     "unused": true,
-    "node": true,
-    "globals": {
-        "describe": true,
-        "it": true,
-        "define": true
-    }
+    "node": true
 }
