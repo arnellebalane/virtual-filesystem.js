@@ -83,7 +83,7 @@ body {
     width: 100%;
     height: 14px;
     font: normal 14px/1 "Consolas", monospace;
-    text-indent: 14px;
+    text-indent: 16px;
     color: #eeeeee;
     white-space: pre-wrap;
     word-wrap: break-word;
@@ -97,4 +97,16 @@ body {
 #terminal p {
     font-size: 1.4rem;
     color: #eeeeee;
+}
+
+#terminal p.red {
+    color: #e53935;
+}
+
+#terminal p.yellow {
+    color: #ffc400;
+}
+
+#terminal p.green {
+    color: #4caf50;
 }
