@@ -41,6 +41,23 @@
         this.search = function(key) {
             return key !== undefined && this.root ? this.root.search(key) : null;
         };
+
+        this.traverse = function() {
+            var queue = [this.root];
+            var traversed = '';
+            for (var i = 1, j = 0; queue.length;) {
+                var pointer = queue.shift();
+                traversed += pointer.key + ' ';
+                j += pointer.children.length;
+                if (!--i) {
+                    i = j;
+                    j = 0;
+                    traversed = traversed.trim() + '\n';
+                }
+                queue = queue.concat(pointer.children);
+            }
+            return traversed.trim();
+        };
     }
 
     function Node(key, properties) {
