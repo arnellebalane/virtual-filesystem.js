@@ -43,22 +43,25 @@
         };
 
         this.traverse = function() {
-            var queue = [this.root];
-            var levels = [];
-            var level = [];
-            for (var i = 1, j = 0; queue.length;) {
-                var pointer = queue.shift();
-                level.push(pointer);
-                j += pointer.children.length;
-                if (!--i) {
-                    i = j;
-                    j = 0;
-                    levels.push(level);
-                    level = [];
+            if (this.root !== null) {
+                var queue = [this.root];
+                var levels = [];
+                var level = [];
+                for (var i = 1, j = 0; queue.length;) {
+                    var pointer = queue.shift();
+                    level.push(pointer);
+                    j += pointer.children.length;
+                    if (!--i) {
+                        i = j;
+                        j = 0;
+                        levels.push(level);
+                        level = [];
+                    }
+                    queue = queue.concat(pointer.children);
                 }
-                queue = queue.concat(pointer.children);
+                return levels;
             }
-            return levels;
+            return [];
         };
     }
 
