@@ -44,19 +44,21 @@
 
         this.traverse = function() {
             var queue = [this.root];
-            var traversed = '';
+            var levels = [];
+            var level = [];
             for (var i = 1, j = 0; queue.length;) {
                 var pointer = queue.shift();
-                traversed += pointer.key + ' ';
+                level.push(pointer);
                 j += pointer.children.length;
                 if (!--i) {
                     i = j;
                     j = 0;
-                    traversed = traversed.trim() + '\n';
+                    levels.push(level);
+                    level = [];
                 }
                 queue = queue.concat(pointer.children);
             }
-            return traversed.trim();
+            return levels;
         };
     }
 
