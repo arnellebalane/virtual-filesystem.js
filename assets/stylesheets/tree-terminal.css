@@ -69,6 +69,7 @@ body {
 
 #terminal .prompt {
     position: relative;
+    top: 1px;
 }
 
 #terminal span {
@@ -97,6 +98,7 @@ body {
 #terminal p {
     font-size: 1.4rem;
     color: #eeeeee;
+    word-break: break-word;
 }
 
 #terminal p.red {
