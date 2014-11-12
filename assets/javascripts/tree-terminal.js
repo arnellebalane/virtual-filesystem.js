@@ -101,11 +101,13 @@ var intercepts = {
         }
     },
     search: function(query) {
-        if (query === undefined) {
+        if (tree === null) {
+            throw new Error('Create a tree first using the `create` command.', 'red');
+        } else if (query === undefined) {
             throw new Error('Missing argument: query');
         }
         var results = tree.search(query);
-        if (results.length) {
+        if (results && results.length) {
             results.forEach(function(node) {
                 var path = [];
                 while (node !== null) {
@@ -115,10 +117,13 @@ var intercepts = {
                 terminal.log('  ' + path.join('/'));
             });
         } else {
-            terminal.log('No results found: ' + query, 'red');
+            terminal.log('No results found for query: ' + query, 'red');
         }
     },
     display: function() {
+        if (tree === null) {
+            throw new Error('Create a tree first using the `create` command.', 'red');
+        }
         var results = tree.traverse();
         if (results.length) {
             results.forEach(function(level) {
@@ -139,7 +144,7 @@ var intercepts = {
     help: function() {
         terminal.log(' ');
         terminal.log('  create           Create a tree. Only one tree can exist at a time.');
-        terminal.log('  insert a [b]     Insert `a` to the current tree under parent `b`. Parent `b`');
+        terminal.log('  insert a b       Insert `a` to the current tree under parent `b`. Parent `b`');
         terminal.log('                       is optional only for the root element.');
         terminal.log('  delete a         Delete the element `a`.');
         terminal.log('  search a         Search for all elements `a`.');
