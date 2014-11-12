@@ -58,18 +58,18 @@ var terminal = {
             }
             params.push(buffer.replace(/(^["']|["']$)/g, ''));
         }
-        if (command in intercepts) {
-            intercepts[command].apply(null, params);
-        } else if (tree === null) {
-            terminal.log('Create a tree first using the `create` command.', 'red');
-        } else if (command in tree) {
-            try {
+        try {
+            if (command in intercepts) {
+                intercepts[command].apply(null, params);
+            } else if (tree === null) {
+                terminal.log('Create a tree first using the `create` command.', 'red');
+            } else if (command in tree) {
                 tree[command].apply(tree, params);
-            } catch (e) {
-                terminal.log(e.message, 'red');
+            } else {
+                terminal.log('Command not found: ' + command, 'red');
             }
-        } else {
-            terminal.log('Command not found: ' + command, 'red');
+        } catch (e) {
+            terminal.log(e.message, 'red');
         }
     },
     log: function(message, color) {
@@ -87,20 +87,23 @@ var intercepts = {
     create: function() {
         if (tree === null) {
             tree = new GenericTree();
-            terminal.log('Generic tree created.', 'green');
+            terminal.log('GenericTree created.', 'green');
         } else {
-            terminal.log('You already have a generic tree. Destroy it first before creating a new one.', 'red');
+            terminal.log('You already have a GenericTree. Destroy it first before creating a new one.', 'red');
         }
     },
     destroy: function() {
         if (tree === null) {
-            terminal.log('No generic tree found to destroy.', 'red');
+            terminal.log('No GenericTree found to destroy.', 'red');
         } else {
             tree = null;
-            terminal.log('Generic tree destroyed.', 'green');
+            terminal.log('GenericTree destroyed.', 'green');
         }
     },
     search: function(query) {
+        if (query === undefined) {
+            throw new Error('Missing argument: query');
+        }
         var results = tree.search(query);
         if (results.length) {
             results.forEach(function(node) {
@@ -109,7 +112,7 @@ var intercepts = {
                     path.unshift(node.key);
                     node = node.parent;
                 }
-                terminal.log(path.join('/'));
+                terminal.log('  ' + path.join('/'));
             });
         } else {
             terminal.log('No results found: ' + query, 'red');
@@ -126,7 +129,7 @@ var intercepts = {
                 terminal.log(string);
             });
         } else {
-            terminal.log('Generic tree is empty.');
+            terminal.log('GenericTree is empty.');
         }
     },
     clear: function() {

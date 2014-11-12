@@ -9,6 +9,9 @@
         this.root = null;
 
         this.insert = function(key, parent, properties) {
+            if (key === undefined) {
+                throw new Error('Missing argument: key');
+            }
             parent = parent !== undefined && parent instanceof Node ? [parent] : this.search(parent);
             var node = new Node(key, properties);
             if (parent === null && !this.root) {
@@ -24,6 +27,9 @@
         };
 
         this.delete = function(node) {
+            if (node === undefined) {
+                throw new Error('Missing argument: key');
+            }
             var targets = node instanceof Node ? [node] : this.search(node);
             if (targets === null || !targets.length) {
                 throw new Error('Target node not found.');
