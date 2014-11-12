@@ -5,5 +5,10 @@
     "noempty": true,
     "undef": true,
     "unused": true,
-    "node": true
+    "node": true,
+    "globals": {
+        "$": true,
+        "GenericTree": true,
+        "define": true
+    }
 }
