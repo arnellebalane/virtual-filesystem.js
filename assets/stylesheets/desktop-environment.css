@@ -66,7 +66,7 @@ html {
     top: 1px;
     left: 0;
     bottom: 0;
-    width: 200px;
+    width: 28%;
     background-color: #eeeeee;
     border-right: 1px solid #d2d0d5;
 }
@@ -88,14 +88,23 @@ html {
     margin-left: -15px;
     list-style: none;
     font-size: 1.2rem;
+    line-height: 1;
     color: #333333;
     cursor: pointer;
-    padding: 3px 15px 2px 15px;
+    padding: 4px 15px 2px 15px;
 }
 
 .window aside section li:hover {
     color: #ffffff;
     background-color: #4f8edb;
+}
+
+.window main {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 72%;
 }
 
 .terminal {
@@ -106,4 +115,58 @@ html {
     width: 500px;
     height: 300px;
     background-color: #222222;
+}
+
+.icon {
+    display: inline-block;
+    vertical-align: top;
+    width: 75px;
+    height: auto;
+    font-size: 1.2rem;
+    text-align: center;
+    line-height: 1;
+    color: #222222;
+    background: none;
+    border-radius: 3px;
+    margin: 5px;
+    padding: 5px;
+    cursor: pointer;
+}
+
+.icon:before {
+    content: "";
+    display: block;
+    width: 80%;
+    padding: 40% 0;
+    margin: 0 auto 5px auto;
+    background: center center no-repeat;
+    background-size: cover;
+    -webkit-box-sizing: content-box;
+    -moz-box-sizing: content-box;
+    box-sizing: content-box;
+}
+
+.icon.highlighted {
+    color: #ffffff;
+    background-color: rgba(119, 170, 219, 1);
+}
+
+.icon.launchpad:before {
+    background-image: url("../images/launchpad.png");
+}
+
+.icon.terminal:before {
+    background-image: url("../images/terminal.png");
+}
+
+.icon.textedit:before {
+    background-image: url("../images/textedit.png");
+}
+
+.icon.documents:before {
+    background-image: url("../images/documents.png");
+}
+
+.icon.sublimetext:before {
+    background-image: url("../images/sublimetext.png");
 }
