@@ -7,10 +7,18 @@
 
     <body>
         <div id="desktop">
-            <div class="icon launchpad">Finder</div>
-            <div class="icon terminal">Terminal</div>
-            <div class="icon textedit">TextEdit</div>
+            <div class="icon launchpad" data-application="finder">Finder</div>
+            <div class="icon terminal" data-application="terminal">Terminal</div>
+            <div class="icon textedit" data-application="textedit">TextEdit</div>
+        </div>
+        
+        <template id="finder">
             <section class="window finder" data-title="Finder - Folder Name">
+                <header>
+                    <span class="action close"></span>
+                    <span class="action minimize"></span>
+                    <span class="action maximize"></span>
+                </header>
                 <aside>
                     <section>
                         <h1>File System</h1>
@@ -33,7 +41,14 @@
                     <div class="icon sublimetext">File Three</div>
                 </main>
             </section>
+        </template>
+        <template id="terminal">
             <section class="window terminal" data-title="Terminal - arnellebalane">
+                <header>
+                    <span class="action close"></span>
+                    <span class="action minimize"></span>
+                    <span class="action maximize"></span>
+                </header>
                 <main>
                     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
                     <p class="green">Laborum excepturi laudantium, impedit molestias!</p>
@@ -45,14 +60,21 @@
                     </div>
                 </main>
             </section>
+        </template>
+        <template id="textedit">
             <section class="window textedit" data-title="TextEdit - Untitled">
+                <header>
+                    <span class="action close"></span>
+                    <span class="action minimize"></span>
+                    <span class="action maximize"></span>
+                </header>
                 <main>
                     <textarea spellcheck="off"></textarea>
                 </main>
             </section>
-        </div>
-        
-        <script src="bower_components/jquery/dist/jquery.min.js"></script>
+        </template>
+
+        <script src="bower_components/jquery/dist/jquery.js"></script>
         <script src="assets/javascripts/generic-tree.js"></script>
         <script src="assets/javascripts/virtual-filesystem.js"></script>
         <script src="assets/javascripts/desktop-environment.js"></script>

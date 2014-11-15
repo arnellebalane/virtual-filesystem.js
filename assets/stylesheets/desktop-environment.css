@@ -26,11 +26,12 @@ html {
     background-image: url("../images/background.png");
     background-size: cover;
     cursor: default;
+    overflow: hidden;
 }
 
 
 
-/** WINDOW STYLES **/
+/** GENERIC WINDOW STYLES **/
 .window {
     position: absolute;
     top: 100px;
@@ -46,20 +47,6 @@ html {
 }
 
 .window:before {
-    content: "";
-    position: absolute;
-    top: -22px;
-    left: 10px;
-    z-index: 1;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background-color: #ff5f50;
-    box-shadow: 19px 0 0 #fec107, 
-                38px 0 0 #16cf36;
-}
-
-.window:after {
     content: attr(data-title);
     display: block;
     font-size: 1.4rem;
@@ -67,6 +54,37 @@ html {
     text-align: center;
     color: #333333;
     margin-top: -28px;
+}
+
+.window header {
+    position: absolute;
+    top: -30px;
+    left: 0;
+    right: 0;
+    height: 30px;
+    padding-left: 10px;
+}
+
+.window .action {
+    float: left;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background-color: #cdcdcd;
+    margin: 8px 5px 0 0;
+    cursor: pointer;
+}
+
+.window.focused .action.close {
+    background-color: #ff5f50;
+}
+
+.window.focused .action.minimize {
+    background-color: #fec107;
+}
+
+.window.focused .action.maximize {
+    background-color: #16CF36;
 }
 
 .window main {
@@ -78,6 +96,9 @@ html {
     overflow: auto;
 }
 
+
+
+/** CUSTOM WINDOW OVERRIDES **/
 .finder aside {
     position: absolute;
     top: 1px;
@@ -159,13 +180,13 @@ html {
     position: relative;
 }
 
-.terminal span {
+.terminal main span {
     position: absolute;
     font-size: 1.2rem;
     color: #ffffff;
 }
 
-.terminal span:after {
+.terminal main span:after {
     content: " $";
 }
 
