@@ -8,13 +8,17 @@ var components = {
         components.icons();
     },
     icons: function() {
-        windows.desktop.on('click', '.icon', function(e) {
+        windows.desktop.on('mousedown', '.icon', function(e) {
             e.stopPropagation();
             if (e.ctrlKey) {
                 $(this).toggleClass('highlighted');
             } else {
                 $('.icon').removeClass('highlighted');
                 $(this).addClass('highlighted');
+            }
+            var target = $(this).closest('.window');
+            if (target.length) {
+                windows.focus(target);
             }
         });
 
@@ -23,7 +27,7 @@ var components = {
             windows.spawn($(this).data('application'));
         });
 
-        windows.desktop.on('click', function(e) {
+        windows.desktop.on('mousedown', function(e) {
             $('.icon').removeClass('highlighted');
         });
     }
@@ -36,13 +40,12 @@ var windows = {
     },
     spawn: function(application) {
         template = $(templates[application]);
-        template.attr('data-index', $('.window').length);
         windows.desktop.append(template);
         windows.focus(template);
     },
     focus: function(target) {
         if (target === undefined) {
-            $('#desktop').on('click', '.window', function(e) {
+            $('#desktop').on('mousedown', '.window', function(e) {
                 $('.window').removeClass('focused');
                 $(this).addClass('focused');
                 windows.desktop.append($(this));
