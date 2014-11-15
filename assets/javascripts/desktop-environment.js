@@ -95,9 +95,16 @@ var windows = {
     actions: function() {
         windows.desktop.on('mousedown', '.window .action', function(e) {
             e.stopPropagation();
-            var parent = $(this).closest('.window');
+            var target = $(this).closest('.window');
+            windows.focus(target);
             if ($(this).hasClass('close')) {
-                windows.close(parent);
+                windows.close(target);
+            } else if ($(this).hasClass('minimize')) {
+                applications[target.data('application')].minimize(target);
+                target.removeClass('maximized');
+            } else if ($(this).hasClass('maximize')) {
+                applications[target.data('application')].maximize(target);
+                target.addClass('maximized');
             }
         });
     }
@@ -105,16 +112,72 @@ var windows = {
 
 var applications = {
     finder: {
-        focus: function(target) {}
+        focus: function(target) {},
+        minimize: function(target) {
+            if (target.hasClass('maximized')) {
+                target.css({
+                    top: target.offset().top + (window.innerHeight - 500) / 2 + 'px',
+                    left: target.offset().left + (window.innerWidth - 800) / 2 + 'px',
+                    width: '700px',
+                    height: '400px'
+                });
+            }
+        },
+        maximize: function(target) {
+            if (!target.hasClass('maximized')) {
+                target.css({
+                    top: '50px', 
+                    left: '50px', 
+                    width: window.innerWidth - 100 + 'px',
+                    height: window.innerHeight - 100 + 'px'
+                });
+            }
+        }
     },
     terminal: {
         focus: function(target) {
-            target.find('textarea').trigger('focus');
+            target.find('textarea').focus();
+        },
+        minimize: function(target) {
+            if (target.hasClass('maximized')) {
+                target.css({
+                    top: target.offset().top + 100 + 'px',
+                    left: target.offset().left + 150 + 'px',
+                    width: '500px',
+                    height: '300px'
+                });
+            }
+        },
+        maximize: function(target) {
+            if (!target.hasClass('maximized')) {
+                target.css({
+                    width: '800px',
+                    height: '500px'
+                });
+            }
         }
     },
     textedit: {
         focus: function(target) {
             target.find('textarea').focus();
+        },
+        minimize: function(target) {
+            if (target.hasClass('maximized')) {
+                target.css({
+                    top: target.offset().top + 200 + 'px',
+                    left: target.offset().left + 50 + 'px',
+                    width: '400px',
+                    height: '300px'
+                });
+            }
+        },
+        maximize: function(target) {
+            if (!target.hasClass('maximized')) {
+                target.css({
+                    width: '500px',
+                    height: '700px'
+                });
+            }
         }
     }
 };
