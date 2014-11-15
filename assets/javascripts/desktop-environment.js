@@ -37,6 +37,7 @@ var windows = {
     desktop: $('#desktop'),
     initialize: function() {
         windows.focus();
+        windows.draggable();
         windows.actions();
     },
     spawn: function(application) {
@@ -57,6 +58,32 @@ var windows = {
                 applications[target.data('application')].focus(target);
             }, 0);
         }
+    },
+    draggable: function() {
+        var target = null;
+        var start = { x: 0, y: 0 };
+        var origin = { x: 0, y: 0 };
+
+        windows.desktop.on('mousedown', '.window header', function(e) {
+            target = $(this).closest('.window');
+            start = { x: e.pageX, y: e.pageY };
+            origin = { x: target.offset().left, y: target.offset().top };
+        });
+
+        windows.desktop.on('mousemove', function(e) {
+            if (target !== null) {
+                target.css({
+                    top: origin.y + (e.pageY - start.y) + 'px',
+                    left: origin.x + (e.pageX - start.x) + 'px'
+                });
+            }
+        });
+
+        windows.desktop.on('mouseup', function() {
+            target = null;
+            start = { x: 0, y: 0 };
+            origin = { x: 0, y: 0 };
+        });
     },
     close: function(target) {
         target.remove();
