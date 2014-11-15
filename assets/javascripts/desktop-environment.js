@@ -37,6 +37,7 @@ var windows = {
     desktop: $('#desktop'),
     initialize: function() {
         windows.focus();
+        windows.actions();
     },
     spawn: function(application) {
         template = $(templates[application]);
@@ -45,15 +46,48 @@ var windows = {
     },
     focus: function(target) {
         if (target === undefined) {
-            $('#desktop').on('mousedown', '.window', function(e) {
-                $('.window').removeClass('focused');
-                $(this).addClass('focused');
-                windows.desktop.append($(this));
+            windows.desktop.on('mousedown', '.window', function(e) {
+                windows.focus($(this));
             });
         } else {
             $('.window').removeClass('focused');
             target.addClass('focused');
             windows.desktop.append(target);
+            setTimeout(function() {
+                applications[target.data('application')].focus(target);
+            }, 0);
+        }
+    },
+    close: function(target) {
+        target.remove();
+        var last = windows.desktop.find('.window').last();
+        if (last.length) {
+            windows.focus(last);
+        }
+    },
+    actions: function() {
+        windows.desktop.on('mousedown', '.window .action', function(e) {
+            e.stopPropagation();
+            var parent = $(this).closest('.window');
+            if ($(this).hasClass('close')) {
+                windows.close(parent);
+            }
+        });
+    }
+};
+
+var applications = {
+    finder: {
+        focus: function(target) {}
+    },
+    terminal: {
+        focus: function(target) {
+            target.find('textarea').trigger('focus');
+        }
+    },
+    textedit: {
+        focus: function(target) {
+            target.find('textarea').focus();
         }
     }
 };
