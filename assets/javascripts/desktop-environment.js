@@ -115,22 +115,22 @@ var applications = {
         focus: function(target) {},
         minimize: function(target) {
             if (target.hasClass('maximized')) {
-                target.css({
+                target.animate({
                     top: target.offset().top + (window.innerHeight - 500) / 2 + 'px',
                     left: target.offset().left + (window.innerWidth - 800) / 2 + 'px',
                     width: '700px',
                     height: '400px'
-                });
+                }, 150);
             }
         },
         maximize: function(target) {
             if (!target.hasClass('maximized')) {
-                target.css({
+                target.animate({
                     top: '50px', 
                     left: '50px', 
                     width: window.innerWidth - 100 + 'px',
                     height: window.innerHeight - 100 + 'px'
-                });
+                }, 150);
             }
         }
     },
@@ -140,20 +140,22 @@ var applications = {
         },
         minimize: function(target) {
             if (target.hasClass('maximized')) {
-                target.css({
+                target.animate({
                     top: target.offset().top + 100 + 'px',
                     left: target.offset().left + 150 + 'px',
                     width: '500px',
                     height: '300px'
-                });
+                }, 150);
             }
         },
         maximize: function(target) {
             if (!target.hasClass('maximized')) {
-                target.css({
+                target.animate({
+                    top: target.offset().top - 100 + 'px',
+                    left: target.offset().left - 150 + 'px',
                     width: '800px',
                     height: '500px'
-                });
+                }, 150);
             }
         }
     },
@@ -163,20 +165,22 @@ var applications = {
         },
         minimize: function(target) {
             if (target.hasClass('maximized')) {
-                target.css({
+                target.animate({
                     top: target.offset().top + 200 + 'px',
                     left: target.offset().left + 50 + 'px',
                     width: '400px',
                     height: '300px'
-                });
+                }, 150);
             }
         },
         maximize: function(target) {
             if (!target.hasClass('maximized')) {
-                target.css({
+                target.animate({
+                    top: target.offset().top - 200 + 'px',
+                    left: target.offset().left - 50 + 'px',
                     width: '500px',
                     height: '700px'
-                });
+                }, 150);
             }
         }
     }
