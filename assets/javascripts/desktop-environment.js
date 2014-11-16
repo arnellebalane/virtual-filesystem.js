@@ -6,6 +6,7 @@ $(document).ready(function() {
 var components = {
     initialize: function() {
         components.icons();
+        components.textareas();
     },
     icons: function() {
         windows.desktop.on('mousedown', '.icon', function(e) {
@@ -30,32 +31,47 @@ var components = {
         windows.desktop.on('mousedown', function(e) {
             $('.icon').removeClass('highlighted');
         });
+    },
+    textareas: function() {
+        windows.desktop.on('keydown', 'textarea.autosize', function(e) {
+            if (e.keyCode === 9) {
+                e.preventDefault();
+            } else if (e.keyCode === 13) {
+                e.preventDefault();
+            } else {
+
+            }
+        });
     }
 };
 
 var windows = {
     desktop: $('#desktop'),
+    instances: {},
     initialize: function() {
         windows.focus();
         windows.draggable();
         windows.actions();
     },
     spawn: function(application) {
-        template = $(templates[application]);
-        windows.desktop.append(template);
-        windows.focus(template);
+        application = applications[application]();
+        var key = $('.window').length;
+        windows.instances[key] = application;
+        application.dom.attr('data-instance', key);
+        windows.desktop.append(application.dom);
+        windows.focus(application);
     },
     focus: function(target) {
         if (target === undefined) {
             windows.desktop.on('mousedown', '.window', function(e) {
-                windows.focus($(this));
+                windows.focus(windows.instances[$(this).data('instance')]);
             });
         } else {
             $('.window').removeClass('focused');
-            target.addClass('focused');
-            windows.desktop.append(target);
+            target.dom.addClass('focused');
+            windows.desktop.append(target.dom);
             setTimeout(function() {
-                applications[target.data('application')].focus(target);
+                target.focus();
             }, 0);
         }
     },
@@ -86,103 +102,39 @@ var windows = {
         });
     },
     close: function(target) {
-        target.remove();
+        target.dom.remove();
         var last = windows.desktop.find('.window').last();
         if (last.length) {
-            windows.focus(last);
+            windows.focus(windows.instances[last.data('instance')]);
         }
     },
     actions: function() {
         windows.desktop.on('mousedown', '.window .action', function(e) {
             e.stopPropagation();
-            var target = $(this).closest('.window');
+            var target = windows.instances[$(this).closest('.window').data('instance')];
             windows.focus(target);
             if ($(this).hasClass('close')) {
                 windows.close(target);
             } else if ($(this).hasClass('minimize')) {
-                applications[target.data('application')].minimize(target);
-                target.removeClass('maximized');
+                target.minimize();
+                target.dom.removeClass('maximized');
             } else if ($(this).hasClass('maximize')) {
-                applications[target.data('application')].maximize(target);
-                target.addClass('maximized');
+                target.maximize();
+                target.dom.addClass('maximized');
             }
         });
     }
 };
 
 var applications = {
-    finder: {
-        focus: function(target) {},
-        minimize: function(target) {
-            if (target.hasClass('maximized')) {
-                target.animate({
-                    top: target.offset().top + (window.innerHeight - 500) / 2 + 'px',
-                    left: target.offset().left + (window.innerWidth - 800) / 2 + 'px',
-                    width: '700px',
-                    height: '400px'
-                }, 150);
-            }
-        },
-        maximize: function(target) {
-            if (!target.hasClass('maximized')) {
-                target.animate({
-                    top: '50px', 
-                    left: '50px', 
-                    width: window.innerWidth - 100 + 'px',
-                    height: window.innerHeight - 100 + 'px'
-                }, 150);
-            }
-        }
+    finder: function() {
+        return new Finder();
     },
-    terminal: {
-        focus: function(target) {
-            target.find('textarea').focus();
-        },
-        minimize: function(target) {
-            if (target.hasClass('maximized')) {
-                target.animate({
-                    top: target.offset().top + 100 + 'px',
-                    left: target.offset().left + 150 + 'px',
-                    width: '500px',
-                    height: '300px'
-                }, 150);
-            }
-        },
-        maximize: function(target) {
-            if (!target.hasClass('maximized')) {
-                target.animate({
-                    top: target.offset().top - 100 + 'px',
-                    left: target.offset().left - 150 + 'px',
-                    width: '800px',
-                    height: '500px'
-                }, 150);
-            }
-        }
+    terminal: function() {
+        return new Terminal();
     },
-    textedit: {
-        focus: function(target) {
-            target.find('textarea').focus();
-        },
-        minimize: function(target) {
-            if (target.hasClass('maximized')) {
-                target.animate({
-                    top: target.offset().top + 200 + 'px',
-                    left: target.offset().left + 50 + 'px',
-                    width: '400px',
-                    height: '300px'
-                }, 150);
-            }
-        },
-        maximize: function(target) {
-            if (!target.hasClass('maximized')) {
-                target.animate({
-                    top: target.offset().top - 200 + 'px',
-                    left: target.offset().left - 50 + 'px',
-                    width: '500px',
-                    height: '700px'
-                }, 150);
-            }
-        }
+    textedit: function() {
+        return new TextEdit();
     }
 };
 
@@ -191,3 +143,93 @@ var templates = {
     terminal: $('template#terminal').html(),
     textedit: $('template#textedit').html()
 };
+
+// WINDOW CLASSES
+function Class() {}
+
+Class.extend = function(child) {
+    var instance = new this();
+    for (var property in instance) {
+        if (!child.prototype.hasOwnProperty(property)) {
+            child.prototype[property] = instance[property];
+        }
+    }
+    for (var property in this) {
+        if (!child.hasOwnProperty(property)) {
+            child[property] = this[property];
+        }
+    }
+};
+
+function Window() {
+    this.focus = function() {};
+
+    this.minimize = function() {
+        if (this.dom.hasClass('maximized')) {
+            this.dom.animate({
+                top: this.dom.offset().top + (this.max_height - this.min_height) / 2 + 'px',
+                left: this.dom.offset().left + (this.max_width - this.min_width) / 2 + 'px',
+                width: this.min_width + 'px',
+                height: this.min_height + 'px'
+            }, 150);
+        }
+    };
+
+    this.maximize = function() {
+        if (!this.dom.hasClass('maximize')) {
+            this.dom.animate({
+                top: this.dom.offset().top - (this.max_height - this.min_height) / 2 + 'px',
+                left: this.dom.offset().left - (this.max_width - this.min_width) / 2 + 'px',
+                width: this.max_width + 'px',
+                height: this.max_height + 'px'
+            }, 150);
+        }
+    };
+}
+Class.extend(Window);
+
+function Finder() {
+    this.min_width = 700;
+    this.min_height = 400;
+    this.max_width = window.innerWidth - 100;
+    this.max_height = window.innerHeight - 100;
+    this.dom = $(templates.finder);
+
+    this.maximize = function() {
+        if (!this.dom.hasClass('maximize')) {
+            this.dom.animate({
+                top: 50 + 'px',
+                left: 50 + 'px',
+                width: this.max_width + 'px',
+                height: this.max_height + 'px'
+            }, 150);
+        }
+    };
+}
+Window.extend(Finder);
+
+function Terminal() {
+    this.min_width = 500;
+    this.min_height = 300;
+    this.max_width = 800;
+    this.max_height = 500;
+    this.dom = $(templates.terminal);
+
+    this.focus = function() {
+        this.dom.find('textarea').focus();
+    };
+}
+Window.extend(Terminal);
+
+function TextEdit() {
+    this.min_width = 400;
+    this.min_height = 300;
+    this.max_width = 500;
+    this.max_height = 700;
+    this.dom = $(templates.textedit);
+
+    this.focus = function() {
+        this.dom.find('textarea').focus();
+    };
+}
+Window.extend(TextEdit);
