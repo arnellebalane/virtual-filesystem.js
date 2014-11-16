@@ -2,13 +2,13 @@
     if (typeof define === 'function' && define.amd) {
         define('virtual-filesystem', ['generic-tree'], library);
     } else {
-        root.VirtualFilesystem = library(root.GenericTree);
+        root.VirtualFileSystem = library(root.GenericTree);
     }
 })(this, function(GenericTree) {
     // @todo: make this extend EventTarget
     function VirtualFileSystem() {
         this.tree = new GenericTree();
-        this.tree.insert('');
+        this.tree.insert('', null, { type: 'directory' });
         this.pointer = this.tree.root;
 
         // @todo: prevent creation of directories with the same name in the same location
@@ -36,6 +36,7 @@
 
         this.cd = function(path) {
             this.pointer = this._resolve_path(path);
+            return this.pointer;
         };
 
         // @todo: prevent creation of files with the same name in the same location
@@ -75,6 +76,14 @@
                 throw new Error('Rename failed. Name already taken.');
             }
             node.key = name;
+        };
+
+        this.ls = function(path) {
+            var node = path === undefined ? this.pointer : this._resolve_path(path);
+            if (node.type === 'directory') {
+                return node.children;
+            }
+            throw new Error('Not a directory: ' + path);
         };
 
         this._resolve_path = function(path) {

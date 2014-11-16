@@ -1,7 +1,18 @@
 $(document).ready(function() {
+    filesystem.initialize();
     components.initialize();
     windows.initialize();
 });
+
+var filesystem = {
+    instance: new VirtualFileSystem(),
+    initialize: function() {
+        filesystem.instance.mkdir('Documents');
+        filesystem.instance.mkdir('Pictures');
+        filesystem.instance.mkdir('Music');
+        filesystem.instance.mkdir('Videos');
+    }
+};
 
 var components = {
     initialize: function() {
@@ -34,12 +45,13 @@ var components = {
     },
     textareas: function() {
         windows.desktop.on('keydown', 'textarea.autosize', function(e) {
+            var target = windows.instance($(this).closest('.window'));
             if (e.keyCode === 9) {
                 e.preventDefault();
             } else if (e.keyCode === 13) {
                 e.preventDefault();
+                target.execute();
             } else {
-                var target = windows.instance($(this).closest('.window'));
                 target.autosize(e.keyCode);
             }
         });
@@ -74,6 +86,7 @@ var windows = {
             setTimeout(function() {
                 target.focus();
             }, 0);
+            filesystem.instance.cd(filesystem.instance._absolute_path(target.pointer));
         }
     },
     draggable: function() {
@@ -130,13 +143,13 @@ var windows = {
 
 var applications = {
     finder: function() {
-        return new Finder();
+        return new Finder(filesystem.instance.pointer);
     },
     terminal: function() {
-        return new Terminal();
+        return new Terminal(filesystem.instance.pointer);
     },
     textedit: function() {
-        return new TextEdit();
+        return new TextEdit(filesystem.instance.pointer);
     }
 };
 
@@ -190,12 +203,13 @@ Window.prototype.maximize = function(callback) {
     }
 };
 
-function Finder() {
+function Finder(pointer) {
     this.min_width = 700;
     this.min_height = 400;
     this.max_width = window.innerWidth - 100;
     this.max_height = window.innerHeight - 100;
     this.dom = $(templates.finder);
+    this.pointer = pointer;
 }
 Window.extend(Finder);
 
@@ -210,7 +224,7 @@ Finder.prototype.maximize = function() {
     }
 };
 
-function Terminal() {
+function Terminal(pointer) {
     this.min_width = 500;
     this.min_height = 300;
     this.max_width = 800;
@@ -218,6 +232,19 @@ function Terminal() {
     this.dom = $(templates.terminal);
     this.prompt = this.dom.find('.prompt span');
     this.input = this.dom.find('textarea');
+    this.pointer = pointer;
+    var self = this;
+
+    this.intercepts = {
+        ls: function(path) {
+            var results = filesystem.instance.ls(path);
+            results.forEach(function(item) {
+                self.log(item.key);
+            });
+        }
+    };
+
+    this.location(this.pointer);
 }
 Window.extend(Terminal);
 
@@ -251,12 +278,63 @@ Terminal.prototype.autosize = function(key) {
     }
 };
 
-function TextEdit() {
+Terminal.prototype.log = function(message, color) {
+    message = $('<p class="' + color + '">' + message + '</p>');
+    this.input.parent().before(message);
+};
+
+Terminal.prototype.location = function(location) {
+    var self = this;
+    self.prompt.text(filesystem.instance._absolute_path(location));
+    setTimeout(function() {
+        self.input.css('text-indent', (self.prompt.width() / 7 + 1) * 7 - 0.5 + 'px');
+    }, 0);
+};
+
+Terminal.prototype.execute = function() {
+    var input = this.input.val();
+    var command = input;
+    var params = [];
+    var index = command.indexOf(' ');
+    if (index >= 0) {
+        var buffer = '';
+        var inside = false;
+        for (var i = index + 1; i < input.length; i++) {
+            var character = input.charAt(i);
+            if (character === ' ' && !inside) {
+                params.push(buffer.replace(/(^["']|["']$)/g, ''));
+                buffer = '';
+                continue;
+            } else if (character === '"' || character === '\'') {
+                inside = !inside;
+            }
+            buffer += character;
+        }
+        params.push(buffer.replace(/(^["']|["']$)/g, ''));
+        command = input.substring(0, index);
+    }
+    this.log(this.prompt.text() + ' $ ' + input);
+    this.input.val('');
+    try {
+        if (this.intercepts.hasOwnProperty(command)) {
+            this.intercepts[command].apply(this, params);
+        } else if (filesystem.instance.hasOwnProperty(command)) {
+            filesystem.instance[command].apply(filesystem.instance, params);
+        } else {
+            throw new Error('Command not found: ' + command);
+        }
+    } catch (e) {
+        this.log(e.message, 'red');
+    }
+};
+
+function TextEdit(pointer) {
     this.min_width = 400;
     this.min_height = 300;
     this.max_width = 500;
     this.max_height = 700;
     this.dom = $(templates.textedit);
+    this.pointer = pointer;
 }
 Window.extend(TextEdit);
 
