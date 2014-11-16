@@ -325,39 +325,43 @@ Terminal.prototype.location = function(location) {
 };
 
 Terminal.prototype.execute = function() {
-    var input = this.input.val();
-    var command = input;
-    var params = [];
-    var index = command.indexOf(' ');
-    if (index >= 0) {
-        var buffer = '';
-        var inside = false;
-        for (var i = index + 1; i < input.length; i++) {
-            var character = input.charAt(i);
-            if (character === ' ' && !inside) {
-                params.push(buffer.replace(/(^["']|["']$)/g, ''));
-                buffer = '';
-                continue;
-            } else if (character === '"' || character === '\'') {
-                inside = !inside;
+    var input = this.input.val().trim();
+    if (input.length) {
+        var command = input;
+        var params = [];
+        var index = command.indexOf(' ');
+        if (index >= 0) {
+            var buffer = '';
+            var inside = false;
+            for (var i = index + 1; i < input.length; i++) {
+                var character = input.charAt(i);
+                if (character === ' ' && !inside) {
+                    params.push(buffer.replace(/(^["']|["']$)/g, ''));
+                    buffer = '';
+                    continue;
+                } else if (character === '"' || character === '\'') {
+                    inside = !inside;
+                }
+                buffer += character;
             }
-            buffer += character;
+            params.push(buffer.replace(/(^["']|["']$)/g, ''));
+            command = input.substring(0, index);
         }
-        params.push(buffer.replace(/(^["']|["']$)/g, ''));
-        command = input.substring(0, index);
-    }
-    this.log(this.prompt.text() + ' $ ' + input);
-    this.input.val('');
-    try {
-        if (this.intercepts.hasOwnProperty(command)) {
-            this.intercepts[command].apply(this, params);
-        } else if (filesystem.instance.hasOwnProperty(command)) {
-            filesystem.instance[command].apply(filesystem.instance, params);
-        } else {
-            throw new Error('Command not found: ' + command);
+        this.log(this.prompt.text() + ' $ ' + input);
+        this.input.val('');
+        try {
+            if (this.intercepts.hasOwnProperty(command)) {
+                this.intercepts[command].apply(this, params);
+            } else if (filesystem.instance.hasOwnProperty(command)) {
+                filesystem.instance[command].apply(filesystem.instance, params);
+            } else {
+                throw new Error('Command not found: ' + command);
+            }
+        } catch (e) {
+            this.log(e.message, 'red');
         }
-    } catch (e) {
-        this.log(e.message, 'red');
+    } else {
+        this.log(this.prompt.text() + ' $');
     }
 };
 
