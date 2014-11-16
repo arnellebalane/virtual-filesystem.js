@@ -117,10 +117,8 @@ var windows = {
                 windows.close(target);
             } else if ($(this).hasClass('minimize')) {
                 target.minimize();
-                target.dom.removeClass('maximized');
             } else if ($(this).hasClass('maximize')) {
                 target.maximize();
-                target.dom.addClass('maximized');
             }
         });
     }
@@ -171,7 +169,7 @@ function Window() {
                 left: this.dom.offset().left + (this.max_width - this.min_width) / 2 + 'px',
                 width: this.min_width + 'px',
                 height: this.min_height + 'px'
-            }, 150);
+            }, 150).removeClass('maximized');
         }
     };
 
@@ -182,7 +180,7 @@ function Window() {
                 left: this.dom.offset().left - (this.max_width - this.min_width) / 2 + 'px',
                 width: this.max_width + 'px',
                 height: this.max_height + 'px'
-            }, 150);
+            }, 150).addClass('maximized');
         }
     };
 }
