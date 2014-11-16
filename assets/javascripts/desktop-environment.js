@@ -13,7 +13,7 @@ var filesystem = {
         filesystem.instance.mkdir('Videos');
     },
     resolve_path: function(path) {
-        return path === undefined ? filesystem.instance.pointer : filesystem.instance._resolve_path(path);
+        return path === undefined ? filesystem.instance.tree.root : filesystem.instance._resolve_path(path);
     },
     absolute_path: function(path) {
         return this.instance._absolute_path(path);
@@ -92,7 +92,9 @@ var windows = {
             setTimeout(function() {
                 target.focus();
             }, 0);
-            filesystem.instance.cd(filesystem.instance._absolute_path(target.pointer));
+            if (target.hasOwnProperty('pointer')) {
+                filesystem.instance.pointer = target.pointer;
+            }
         }
     },
     draggable: function() {
@@ -243,7 +245,7 @@ function Terminal(pointer) {
 
     this.intercepts = {
         ls: function(path) {
-            var results = filesystem.instance.ls(path);
+            var results = filesystem.instance.ls(path || filesystem.absolute_path(this.pointer));
             var width = 0;
             results.forEach(function(item) {
                 width = Math.max(width, item.key.length);
@@ -263,6 +265,9 @@ function Terminal(pointer) {
                 }
             }
             this.log(line);
+        },
+        cd: function(path) {
+            this.location(filesystem.instance.cd(path));
         }
     };
 
@@ -312,7 +317,8 @@ Terminal.prototype.log = function(message, color) {
 
 Terminal.prototype.location = function(location) {
     var self = this;
-    self.prompt.text(filesystem.instance._absolute_path(location));
+    self.pointer = location;
+    self.prompt.text(filesystem.absolute_path(location));
     setTimeout(function() {
         self.input.css('text-indent', (self.prompt.width() / 7 + 1) * 7 - 0.5 + 'px');
     }, 0);
