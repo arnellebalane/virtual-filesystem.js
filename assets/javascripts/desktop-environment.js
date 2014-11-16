@@ -39,7 +39,8 @@ var components = {
             } else if (e.keyCode === 13) {
                 e.preventDefault();
             } else {
-
+                var target = windows.instance($(this).closest('.window'));
+                target.autosize(e.keyCode);
             }
         });
     }
@@ -64,7 +65,7 @@ var windows = {
     focus: function(target) {
         if (target === undefined) {
             windows.desktop.on('mousedown', '.window', function(e) {
-                windows.focus(windows.instances[$(this).data('instance')]);
+                windows.focus(windows.instance($(this)));
             });
         } else {
             $('.window').removeClass('focused');
@@ -105,13 +106,13 @@ var windows = {
         target.dom.remove();
         var last = windows.desktop.find('.window').last();
         if (last.length) {
-            windows.focus(windows.instances[last.data('instance')]);
+            windows.focus(windows.instance(last));
         }
     },
     actions: function() {
         windows.desktop.on('mousedown', '.window .action', function(e) {
             e.stopPropagation();
-            var target = windows.instances[$(this).closest('.window').data('instance')];
+            var target = windows.instance($(this).closest('.window'));
             windows.focus(target);
             if ($(this).hasClass('close')) {
                 windows.close(target);
@@ -121,6 +122,9 @@ var windows = {
                 target.maximize();
             }
         });
+    },
+    instance: function(target) {
+        return windows.instances[target.data('instance')];
     }
 };
 
@@ -200,7 +204,7 @@ function Finder() {
                 left: 50 + 'px',
                 width: this.max_width + 'px',
                 height: this.max_height + 'px'
-            }, 150);
+            }, 150).addClass('maximized');
         }
     };
 }
@@ -212,9 +216,23 @@ function Terminal() {
     this.max_width = 800;
     this.max_height = 500;
     this.dom = $(templates.terminal);
+    this.prompt = this.dom.find('.prompt span');
+    this.input = this.dom.find('textarea');
 
     this.focus = function() {
         this.dom.find('textarea').focus();
+    };
+
+    this.autosize = function(key) {
+        var limit = Math.ceil(+(this.dom.find('main').width()) / 7) + 3;
+        var length = this.input.val().length + this.prompt.text().length + 4;
+        length -= key === 8 ? 1 : 0;
+        this.input.height((~~(length / limit) + 1) * 12);
+        if (this.dom.find('.contents').height() > this.dom.find('main').height()) {
+            this.dom.find('.contents').addClass('overflow');
+        } else {
+            this.dom.find('.contents').removeClass('overflow');
+        }
     };
 }
 Window.extend(Terminal);

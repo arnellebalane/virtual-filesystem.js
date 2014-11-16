@@ -152,7 +152,14 @@ html {
 }
 
 .terminal main {
-    padding: 7px;
+    margin: 7px;
+}
+
+.terminal .contents.overflow {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
 }
 
 .terminal p {
