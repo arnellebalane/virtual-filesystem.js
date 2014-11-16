@@ -11,6 +11,12 @@ var filesystem = {
         filesystem.instance.mkdir('Pictures');
         filesystem.instance.mkdir('Music');
         filesystem.instance.mkdir('Videos');
+    },
+    resolve_path: function(path) {
+        return path === undefined ? filesystem.instance.pointer : filesystem.instance._resolve_path(path);
+    },
+    absolute_path: function(path) {
+        return this.instance._absolute_path(path);
     }
 };
 
@@ -142,14 +148,14 @@ var windows = {
 };
 
 var applications = {
-    finder: function() {
-        return new Finder(filesystem.instance.pointer);
+    finder: function(path) {
+        return new Finder(filesystem.resolve_path(path));
     },
-    terminal: function() {
-        return new Terminal(filesystem.instance.pointer);
+    terminal: function(path) {
+        return new Terminal(filesystem.resolve_path(path));
     },
-    textedit: function() {
-        return new TextEdit(filesystem.instance.pointer);
+    textedit: function(path) {
+        return new TextEdit(filesystem.resolve_path(path));
     }
 };
 
@@ -238,9 +244,25 @@ function Terminal(pointer) {
     this.intercepts = {
         ls: function(path) {
             var results = filesystem.instance.ls(path);
+            var width = 0;
             results.forEach(function(item) {
-                self.log(item.key);
+                width = Math.max(width, item.key.length);
             });
+            width += 5;
+            var columns = ~~(this.min_width / 7 / width);
+            var line = '';
+            for (var i = 0, j = columns; i < results.length; i++) {
+                line += results[i].key;
+                for (var k = 0; k < width - results[i].key.length; k++) {
+                    line += '\u00a0';
+                }
+                if (--j == 0) {
+                    this.log(line);
+                    line = '';
+                    j = columns;
+                }
+            }
+            this.log(line);
         }
     };
 
@@ -281,6 +303,11 @@ Terminal.prototype.autosize = function(key) {
 Terminal.prototype.log = function(message, color) {
     message = $('<p class="' + color + '">' + message + '</p>');
     this.input.parent().before(message);
+    if (this.dom.find('.contents').height() > this.dom.find('main').height()) {
+        this.dom.find('.contents').addClass('overflow');
+    } else {
+        this.dom.find('.contents').removeClass('overflow');
+    }
 };
 
 Terminal.prototype.location = function(location) {
