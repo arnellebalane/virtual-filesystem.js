@@ -31,6 +31,13 @@ html {
 
 
 
+/** GENERIC STYLES **/
+.hidden {
+    display: none;
+}
+
+
+
 /** GENERIC WINDOW STYLES **/
 .window {
     position: absolute;
@@ -210,6 +217,10 @@ html {
     border: none;
     outline: none;
     resize: none;
+}
+
+.terminal textarea[data-capture-enter="false"] {
+    text-indent: 0 !important;
 }
 
 .textedit {

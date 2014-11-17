@@ -54,11 +54,14 @@ var components = {
             var target = windows.instance($(this).closest('.window'));
             if (e.keyCode === 9) {
                 e.preventDefault();
-            } else if (e.keyCode === 13) {
+            } else if (e.keyCode === 13 && $(this).attr('data-capture-enter') === 'true') {
                 e.preventDefault();
                 target.execute();
+            } else if (e.keyCode === 83 && e.ctrlKey) {
+                e.preventDefault();
+                target.apply_buffer();
             } else {
-                target.autosize(e.keyCode);
+                target.autosize(e);
             }
         });
     }
@@ -240,6 +243,7 @@ function Terminal(pointer) {
     this.dom = $(templates.terminal);
     this.prompt = this.dom.find('.prompt span');
     this.input = this.dom.find('textarea');
+    this.buffer = null;
     this.pointer = pointer;
     var self = this;
 
@@ -268,6 +272,36 @@ function Terminal(pointer) {
         },
         cd: function(path) {
             this.location(filesystem.instance.cd(path));
+        },
+        cat: function(params) {
+            params = Array.prototype.slice.call(arguments);
+            if (params[0].match('^(>|>>)$') && params.length < 3) {
+                params[0] = params[0] === '>>' ? '' : params[0];
+                execute.call(this, params);
+                params[0] = '>';
+                execute.call(this, params);
+                this.buffer = 'cat ' + params.join(' ');
+                this.input.attr('data-capture-enter', 'false');
+                this.prompt.addClass('hidden');
+            } else {
+                if (!params[0].match('^(>|>>)$')) {
+                    params.unshift('');
+                }
+                execute.call(this, params);
+                this.buffer = null;
+                this.input.attr('data-capture-enter', 'true');
+                this.prompt.removeClass('hidden');
+            }
+
+            function execute(params) {
+                var output = filesystem.instance.cat.apply(filesystem.instance, params);
+                if (output !== undefined) {
+                    output = output.split(/\r?\n/g);
+                    for (var i = 0; i < output.length; i++) {
+                        this.log(output[i]);
+                    }
+                }
+            }
         }
     };
 
@@ -293,16 +327,28 @@ Terminal.prototype.maximize = function() {
     });
 };
 
-Terminal.prototype.autosize = function(key) {
-    var limit = Math.ceil(+(this.dom.find('main').width()) / 7) + 3;
-    var length = this.input.val().length + this.prompt.text().length + 4;
-    length -= key === 8 ? 1 : 0;
-    this.input.height((~~(length / limit) + 1) * 12);
+Terminal.prototype.autosize = function(e) {
+    if (e === undefined) {
+        resize();
+    } else {
+        setTimeout(resize, 0, e);
+    }
+    
+    function resize(e) {
+        $(e.target).css('height', 'auto');
+        $(e.target).css('height', e.target.scrollHeight + 'px');
+    }
+
     if (this.dom.find('.contents').height() > this.dom.find('main').height()) {
         this.dom.find('.contents').addClass('overflow');
     } else {
         this.dom.find('.contents').removeClass('overflow');
     }
+};
+
+Terminal.prototype.apply_buffer = function() {
+    var command = this.buffer + ' "' + this.input.val() + '"';
+    this.execute(command);
 };
 
 Terminal.prototype.log = function(message, color) {
@@ -324,8 +370,8 @@ Terminal.prototype.location = function(location) {
     }, 0);
 };
 
-Terminal.prototype.execute = function() {
-    var input = this.input.val().trim();
+Terminal.prototype.execute = function(input) {
+    input = input === undefined ? this.input.val().trim() : input;
     if (input.length) {
         var command = input;
         var params = [];
@@ -347,7 +393,14 @@ Terminal.prototype.execute = function() {
             params.push(buffer.replace(/(^["']|["']$)/g, ''));
             command = input.substring(0, index);
         }
-        this.log(this.prompt.text() + ' $ ' + input);
+        if (this.buffer === null) {
+            this.log(this.prompt.text() + ' $ ' + input);
+        } else {
+            var buffer = this.input.val().split(/\r?\n/g);
+            for (var i = 0; i < buffer.length; i++) {
+                this.log(buffer[i]);
+            }
+        }
         this.input.val('');
         try {
             if (this.intercepts.hasOwnProperty(command)) {
