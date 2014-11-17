@@ -59,7 +59,7 @@ var components = {
                 target.execute();
             } else if (e.keyCode === 83 && e.ctrlKey) {
                 e.preventDefault();
-                target.apply_buffer();
+                target.keyboard_handler(e);
             } else {
                 target.autosize(e);
             }
@@ -346,9 +346,11 @@ Terminal.prototype.autosize = function(e) {
     }
 };
 
-Terminal.prototype.apply_buffer = function() {
-    var command = this.buffer + ' "' + this.input.val() + '"';
-    this.execute(command);
+Terminal.prototype.keyboard_handler = function(e) {
+    if (e.keyCode === 83 && e.ctrlKey) {
+        var command = this.buffer + ' "' + this.input.val() + '"';
+        this.execute(command);
+    }
 };
 
 Terminal.prototype.log = function(message, color) {
