@@ -50,7 +50,7 @@ var components = {
         });
     },
     textareas: function() {
-        windows.desktop.on('keydown', 'textarea.autosize', function(e) {
+        windows.desktop.on('keydown', 'textarea', function(e) {
             var target = windows.instance($(this).closest('.window'));
             if (e.keyCode === 9) {
                 e.preventDefault();
@@ -60,7 +60,7 @@ var components = {
             } else if (e.keyCode === 83 && e.ctrlKey) {
                 e.preventDefault();
                 target.keyboard_handler(e);
-            } else {
+            } else if ($(this).hasClass('autosize')) {
                 target.autosize(e);
             }
         });
@@ -191,6 +191,7 @@ function Window() {}
 Class.extend(Window);
 
 Window.prototype.focus = function() {};
+Window.prototype.keyboard_handler = function() {};
 
 Window.prototype.minimize = function(callback) {
     if (this.dom.hasClass('maximized')) {
