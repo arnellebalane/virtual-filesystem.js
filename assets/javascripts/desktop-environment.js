@@ -337,7 +337,7 @@ Terminal.prototype.autosize = function(e) {
     
     function resize(target) {
         target.css('height', 'auto');
-        target.css('height', e.target.scrollHeight + 'px');
+        target.css('height', target[0].scrollHeight + 'px');
     }
 
     if (this.dom.find('.contents').height() > this.dom.find('main').height()) {
@@ -424,8 +424,8 @@ Terminal.prototype.execute = function(input) {
 function TextEdit(pointer) {
     this.min_width = 400;
     this.min_height = 300;
-    this.max_width = 500;
-    this.max_height = 700;
+    this.max_width = 450;
+    this.max_height = 550;
     this.dom = $(templates.textedit);
     this.pointer = pointer;
 }
