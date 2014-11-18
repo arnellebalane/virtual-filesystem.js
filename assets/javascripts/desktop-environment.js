@@ -384,6 +384,7 @@ Terminal.prototype.location = function(location) {
     var self = this;
     self.pointer = location;
     self.prompt.text(filesystem.absolute_path(location));
+    self.dom.attr('data-title', 'Terminal - ' +( location.key ? location.key : '/'));
     setTimeout(function() {
         self.input.css('text-indent', (self.prompt.width() / 7 + 1) * 7 - 0.5 + 'px');
     }, 0);
