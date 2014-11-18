@@ -5,7 +5,6 @@
         root.VirtualFileSystem = library(root.GenericTree);
     }
 })(this, function(GenericTree) {
-    // @todo: make this extend EventTarget
     function VirtualFileSystem() {
         this.tree = new GenericTree();
         this.tree.insert('', null, { type: 'directory' });
@@ -50,8 +49,6 @@
             return this.pointer;
         };
 
-        // @todo: prevent creation of files with the same name in the same location
-        // @todo: throw error if cat-ed path is not a file
         this.cat = function(mode, path, contents) {
             if (path === undefined) {
                 throw new Error('Missing argument: path');
@@ -60,7 +57,9 @@
             var parent = this._resolve_path(segments.slice(0, segments.length - 1).join('/'));
             var name = segments[segments.length - 1];
             var node = parent.find(name);
-            if (mode.length) {
+            if (node !== null && node.type !== 'file') {
+                throw new Error('Not a file: ' + path);
+            } else if (mode.length) {
                 if (node === null) {
                     node = this.tree.insert(name, parent, { type: 'file', contents: '' });
                 }
