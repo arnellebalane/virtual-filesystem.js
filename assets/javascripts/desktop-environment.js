@@ -317,7 +317,7 @@ function Terminal(pointer) {
                     this.log(filesystem.absolute_path(results[i]));
                 }
             } else {
-                this.log('No results found: ' + query.join(' '), 'red');
+                this.log('No results found: ' + query, 'red');
             }
         }
     };

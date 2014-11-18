@@ -13,6 +13,9 @@
 
         // @todo: prevent creation of directories with the same name in the same location
         this.mkdir = function(path) {
+            if (path === undefined) {
+                throw new Error('Missing argument: path');
+            }
             var segments = path.replace(/\/+$/g, '').split('/');
             var parent = this._resolve_path(segments.slice(0, segments.length - 1).join('/'));
             var name = segments[segments.length - 1];
@@ -20,6 +23,9 @@
         };
 
         this.rmdir = function(path) {
+            if (path === undefined) {
+                throw new Error('Missing argument: path');
+            }
             var node = this._resolve_path(path.replace(/\/+$/g, ''));
             if (node === this.tree.root) {
                 throw new Error('You cannot delete the root directory.');
@@ -35,6 +41,9 @@
         };
 
         this.cd = function(path) {
+            if (path === undefined) {
+                throw new Error('Missing argument: path');
+            }
             this.pointer = this._resolve_path(path);
             return this.pointer;
         };
@@ -42,6 +51,9 @@
         // @todo: prevent creation of files with the same name in the same location
         // @todo: throw error if cat-ed path is not a file
         this.cat = function(mode, path, contents) {
+            if (path === undefined) {
+                throw new Error('Missing argument: path');
+            }
             var segments = path.replace(/\/+$/g, '').split('/');
             var parent = this._resolve_path(segments.slice(0, segments.length - 1).join('/'));
             var name = segments[segments.length - 1];
@@ -60,6 +72,9 @@
         };
 
         this.rm = function(path) {
+            if (path === undefined) {
+                throw new Error('Missing argument: path');
+            }
             var node = this._resolve_path(path.replace(/\/+$/g, ''));
             if (node.type !== 'file') {
                 throw new Error('Not a file: ' + node.key);
@@ -68,6 +83,11 @@
         };
 
         this.rn = function(path, name) {
+            if (path === undefined) {
+                throw new Error('Missing argument: path');
+            } else if (name === undefined) {
+                throw new Error('Missing argument: name');
+            }
             var node = this._resolve_path(path);
             if (node === this.tree.root) {
                 throw new Error('You cannot rename the root directory.');
@@ -80,6 +100,11 @@
         };
 
         this.cp = function(target, destination) {
+            if (target === undefined) {
+                throw new Error('Missing argument: target');
+            } else if (destination === undefined) {
+                throw new Error('Missing argument: destination');
+            }
             target = typeof target === 'object' ? target : this._resolve_path(target);
             destination = typeof destination === 'object' ? destination : this._resolve_path(destination);
             var properties = { type: target.type };
@@ -94,6 +119,11 @@
         };
 
         this.mv = function(target, destination) {
+            if (target === undefined) {
+                throw new Error('Missing argument: target');
+            } else if (destination === undefined) {
+                throw new Error('Missing argument: destination');
+            }
             target = typeof target === 'object' ? target : this._resolve_path(target);
             destination = typeof destination === 'object' ? destination : this._resolve_path(destination);
             this.tree.delete(target);
@@ -109,6 +139,9 @@
         };
 
         this.whereis = function(query) {
+            if (query === undefined) {
+                throw new Error('Missing argument: query');
+            }
             return this.tree.search(query);
         };
 
