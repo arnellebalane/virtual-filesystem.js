@@ -11,7 +11,6 @@
         this.tree.insert('', null, { type: 'directory' });
         this.pointer = this.tree.root;
 
-        // @todo: prevent creation of directories with the same name in the same location
         this.mkdir = function(path) {
             if (path === undefined) {
                 throw new Error('Missing argument: path');
@@ -19,6 +18,9 @@
             var segments = path.replace(/\/+$/g, '').split('/');
             var parent = this._resolve_path(segments.slice(0, segments.length - 1).join('/'));
             var name = segments[segments.length - 1];
+            if (parent.find(name) !== null) {
+                throw new Error('Name already taken: ' + name);
+            }
             this.tree.insert(name, parent, { type: 'directory' });
         };
 
