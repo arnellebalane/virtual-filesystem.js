@@ -304,6 +304,12 @@ function Terminal(pointer) {
                 }
             }
         },
+        edit: function(path) {
+            this.intercepts.cat.apply(this, ['>>', path]);
+        },
+        show: function(path) {
+            this.intercepts.cat.apply(this, [path]);
+        },
         whereis: function(query) {
             var results = filesystem.instance.whereis(query);
             if (results.length) {
