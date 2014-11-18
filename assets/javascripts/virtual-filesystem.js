@@ -40,6 +40,7 @@
         };
 
         // @todo: prevent creation of files with the same name in the same location
+        // @todo: throw error if cat-ed path is not a file
         this.cat = function(mode, path, contents) {
             var segments = path.replace(/\/+$/g, '').split('/');
             var parent = this._resolve_path(segments.slice(0, segments.length - 1).join('/'));
@@ -90,6 +91,13 @@
                 this.cp(target.children[i], node);
             }
             return node;
+        };
+
+        this.mv = function(target, destination) {
+            target = typeof target === 'object' ? target : this._resolve_path(target);
+            destination = typeof destination === 'object' ? destination : this._resolve_path(destination);
+            this.tree.delete(target);
+            return this.cp.call(this, target, destination);
         };
 
         this.ls = function(path) {

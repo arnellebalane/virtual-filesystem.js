@@ -330,14 +330,14 @@ Terminal.prototype.maximize = function() {
 
 Terminal.prototype.autosize = function(e) {
     if (e === undefined) {
-        resize();
+        resize(this.input);
     } else {
-        setTimeout(resize, 0, e);
+        setTimeout(resize, 0, this.input);
     }
     
-    function resize(e) {
-        $(e.target).css('height', 'auto');
-        $(e.target).css('height', e.target.scrollHeight + 'px');
+    function resize(target) {
+        target.css('height', 'auto');
+        target.css('height', e.target.scrollHeight + 'px');
     }
 
     if (this.dom.find('.contents').height() > this.dom.find('main').height()) {
