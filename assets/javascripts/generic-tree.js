@@ -12,7 +12,7 @@
             if (key === undefined) {
                 throw new Error('Missing argument: key');
             }
-            parent = parent !== undefined && parent instanceof Node ? [parent] : this.search(parent);
+            parent = parent instanceof Node ? [parent] : this.search(parent);
             var node = new Node(key, properties);
             if (parent === null && !this.root) {
                 this.root = node;

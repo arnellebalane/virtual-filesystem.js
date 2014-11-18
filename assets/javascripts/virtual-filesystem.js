@@ -78,6 +78,20 @@
             node.key = name;
         };
 
+        this.cp = function(target, destination) {
+            target = typeof target === 'object' ? target : this._resolve_path(target);
+            destination = typeof destination === 'object' ? destination : this._resolve_path(destination);
+            var properties = { type: target.type };
+            if (properties.type === 'file') {
+                properties.contents = target.contents;
+            }
+            var node = this.tree.insert(target.key, destination, properties);
+            for (var i = 0; i < target.children.length; i++) {
+                this.cp(target.children[i], node);
+            }
+            return node;
+        };
+
         this.ls = function(path) {
             var node = path === undefined ? this.pointer : this._resolve_path(path);
             if (node.type === 'directory') {
