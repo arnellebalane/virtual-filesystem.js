@@ -303,6 +303,16 @@ function Terminal(pointer) {
                     }
                 }
             }
+        },
+        whereis: function(query) {
+            var results = filesystem.instance.whereis(query);
+            if (results.length) {
+                for (var i = 0; i < results.length; i++) {
+                    this.log(filesystem.absolute_path(results[i]));
+                }
+            } else {
+                this.log('No results found: ' + query.join(' '), 'red');
+            }
         }
     };
 

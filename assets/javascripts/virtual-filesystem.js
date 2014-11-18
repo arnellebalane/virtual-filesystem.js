@@ -108,6 +108,10 @@
             throw new Error('Not a directory: ' + path);
         };
 
+        this.whereis = function(query) {
+            return this.tree.search(query);
+        };
+
         this._resolve_path = function(path) {
             path = path.match('^\/') ? path : './' + path;
             path = path.split('/');
