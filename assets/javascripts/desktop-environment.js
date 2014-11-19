@@ -304,8 +304,11 @@ Finder.prototype.maximize = function() {
 Finder.prototype.location = function(location) {
     this.pointer = location;
     this.history = this.history.slice(0, Math.max(this.cursor, -1) + 1);
-    this.history.push(this.pointer);
-    this.cursor++;
+    var last = this.history[this.history.length - 1];
+    if (this.pointer !== last) {
+        this.history.push(this.pointer);
+        this.cursor++;
+    }
     this.refresh();
 };
 
