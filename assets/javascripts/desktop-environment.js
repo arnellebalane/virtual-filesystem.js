@@ -11,6 +11,24 @@ var filesystem = {
         filesystem.instance.mkdir('Pictures');
         filesystem.instance.mkdir('Music');
         filesystem.instance.mkdir('Videos');
+        filesystem.instance.mkdir('Documents/Academics');
+        filesystem.instance.mkdir('Documents/Projects');
+        filesystem.instance.mkdir('Documents/Work');
+        filesystem.instance.mkdir('Documents/Codes');
+        filesystem.instance.mkdir('Documents/Academics/cmsc142');
+        filesystem.instance.mkdir('Documents/Academics/cmsc141');
+        filesystem.instance.mkdir('Documents/Academics/sts40');
+        filesystem.instance.mkdir('Documents/Academics/cmsc198.1');
+        filesystem.instance.mkdir('Documents/Codes/Javascript');
+        filesystem.instance.mkdir('Documents/Codes/Python');
+        filesystem.instance.mkdir('Documents/Codes/Ruby');
+
+        filesystem.instance.cat('>', 'Documents/Academics/cmsc142/mp1.c', 'hello world');
+        filesystem.instance.cat('>', 'Documents/Academics/cmsc142/mp2.c', 'hello world again');
+        filesystem.instance.cat('>', 'Documents/Codes/Javascript/sample.js', 'this is a sample javascript file');
+        filesystem.instance.cat('>', 'Documents/Codes/Javascript/script.js', 'this is another sample javascript file');
+        filesystem.instance.cat('>', 'Documents/Codes/Python/sample.py', 'this is a sample python file');
+        filesystem.instance.cat('>', 'Documents/Codes/Ruby/sample.rb', 'this is a sample ruby file');
     },
     resolve_path: function(path) {
         return path === undefined ? filesystem.instance.tree.root : filesystem.instance._resolve_path(path);
@@ -24,6 +42,7 @@ var components = {
     initialize: function() {
         components.icons();
         components.textareas();
+        components.huds();
     },
     icons: function() {
         windows.desktop.on('mousedown', '.icon', function(e) {
@@ -69,6 +88,12 @@ var components = {
             } else if ($(this).hasClass('autosize')) {
                 target.autosize(e);
             }
+        });
+    },
+    huds: function() {
+        windows.desktop.on('mousedown', '.window .action-button', function(e) {
+            var target = windows.instance($(this).closest('.window'));
+            target.huds_handler(e);
         });
     }
 };
@@ -205,6 +230,7 @@ Class.extend(Window);
 Window.prototype.focus = function() {};
 Window.prototype.keyboard_handler = function() {};
 Window.prototype.icons_handler = function() {};
+Window.prototype.huds_handler = function() {};
 
 Window.prototype.minimize = function(callback) {
     if (this.dom.hasClass('maximized')) {
@@ -233,7 +259,11 @@ function Finder(pointer) {
     this.min_height = 400;
     this.max_width = window.innerWidth - 100;
     this.max_height = window.innerHeight - 100;
+    this.history = [];
+    this.cursor = -1;
     this.dom = $(templates.finder);
+    this.address_bar = this.dom.find('input[name="path"]');
+    this.search_bar = this.dom.find('input[name="search"]');
     this.pointer = null;
     var self = this;
 
@@ -254,10 +284,38 @@ Finder.prototype.maximize = function() {
 
 Finder.prototype.location = function(location) {
     this.pointer = location;
+    this.history = this.history.slice(0, Math.max(this.cursor, -1) + 1);
+    this.history.push(this.pointer);
+    this.cursor++;
+    this.refresh();
+};
+
+Finder.prototype.navigate = function(direction) {
+    if (direction === 'back') {
+        this.pointer = this.history[--this.cursor];
+    } else if (direction === 'forward') {
+        this.pointer = this.history[++this.cursor];
+    }
+    this.refresh();
+};
+
+Finder.prototype.refresh = function() {
     this.dom.attr('data-title', 'Finder - ' + (this.pointer.key ? this.pointer.key : '/'));
+    var path = filesystem.absolute_path(this.pointer);
+    this.address_bar.val(path ? path : '/');
     this.dom.find('main').empty();
     for (var i = 0; i < this.pointer.children.length; i++) {
         this.insert(this.pointer.children[i]);
+    }
+    if (this.cursor === 0) {
+        this.dom.find('.action-button.back').addClass('disabled');
+    } else {
+        this.dom.find('.action-button.back').removeClass('disabled');
+    }
+    if (this.cursor === this.history.length - 1) {
+        this.dom.find('.action-button.forward').addClass('disabled');
+    } else {
+        this.dom.find('.action-button.forward').removeClass('disabled');
     }
 };
 
@@ -276,7 +334,16 @@ Finder.prototype.icons_handler = function(e) {
     if (icon.hasClass('documents')) {
         this.location(filesystem.resolve_path(icon.data('path')));
     } else if (icon.hasClass('sublimetext')) {
+        // open file with textedit
+    }
+};
 
+Finder.prototype.huds_handler = function(e) {
+    var target = $(e.target);
+    if (target.hasClass('back') && !target.hasClass('disabled')) {
+        this.navigate('back');
+    } else if (target.hasClass('forward') && !target.hasClass('disabled')) {
+        this.navigate('forward');
     }
 };
 

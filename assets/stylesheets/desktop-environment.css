@@ -137,9 +137,7 @@ html {
 }
 
 .finder input[type="text"]:focus {
-    top: 1px;
     color: #333333;
-    box-shadow: 0 0 1px rgba(40, 40, 40, 0.25);
 }
 
 .finder input[name="path"] {
@@ -375,6 +373,15 @@ html {
     top: 1px;
     background-color: #fafafa;
     box-shadow: 0 0 1px rgba(40, 40, 40, 0.25);
+}
+
+.action-button.disabled {
+    background-color: #f5f5f5;
+}
+
+.action-button.disabled:active {
+    top: 0;
+    box-shadow: 0 1px 1px rgba(40, 40, 40, 0.25);
 }
 
 .action-button[data-icon="back"]:before {
