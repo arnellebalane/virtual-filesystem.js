@@ -141,7 +141,7 @@ html {
 }
 
 .finder input[name="path"] {
-    width: 355px;
+    width: calc(100% - 324px);
     margin-left: 10px;
 }
 
