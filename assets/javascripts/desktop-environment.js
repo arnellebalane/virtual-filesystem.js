@@ -27,7 +27,6 @@ var components = {
     },
     icons: function() {
         windows.desktop.on('mousedown', '.icon', function(e) {
-            e.stopPropagation();
             if (e.ctrlKey) {
                 $(this).toggleClass('highlighted');
             } else {
@@ -45,8 +44,15 @@ var components = {
             windows.spawn($(this).data('application'));
         });
 
+        windows.desktop.on('dblclick', '.window .icon', function(e) {
+            var target = windows.instance($(this).closest('.window'));
+            target.icons_handler(e);
+        });
+
         windows.desktop.on('mousedown', function(e) {
-            $('.icon').removeClass('highlighted');
+            if (!$(e.target).hasClass('icon')) {
+                $('.icon').removeClass('highlighted');
+            }
         });
     },
     textareas: function() {
@@ -89,15 +95,17 @@ var windows = {
                 windows.focus(windows.instance($(this)));
             });
         } else {
-            $('.window').removeClass('focused');
-            target.dom.addClass('focused');
-            windows.desktop.append(target.dom);
+            if (!target.dom.hasClass('focused')) {
+                $('.window').removeClass('focused');
+                target.dom.addClass('focused');
+                windows.desktop.append(target.dom);
+                if (target.hasOwnProperty('pointer')) {
+                    filesystem.instance.pointer = target.pointer;
+                }
+            }
             setTimeout(function() {
                 target.focus();
             }, 0);
-            if (target.hasOwnProperty('pointer')) {
-                filesystem.instance.pointer = target.pointer;
-            }
         }
     },
     draggable: function() {
@@ -192,6 +200,7 @@ Class.extend(Window);
 
 Window.prototype.focus = function() {};
 Window.prototype.keyboard_handler = function() {};
+Window.prototype.icons_handler = function() {};
 
 Window.prototype.minimize = function(callback) {
     if (this.dom.hasClass('maximized')) {
@@ -221,7 +230,10 @@ function Finder(pointer) {
     this.max_width = window.innerWidth - 100;
     this.max_height = window.innerHeight - 100;
     this.dom = $(templates.finder);
-    this.pointer = pointer;
+    this.pointer = null;
+    var self = this;
+
+    this.location(pointer);
 }
 Window.extend(Finder);
 
@@ -233,6 +245,34 @@ Finder.prototype.maximize = function() {
             width: this.max_width + 'px',
             height: this.max_height + 'px'
         }, 150).addClass('maximized');
+    }
+};
+
+Finder.prototype.location = function(location) {
+    this.pointer = location;
+    this.dom.attr('data-title', 'Finder - ' + (this.pointer.key ? this.pointer.key : '/'));
+    this.dom.find('main').empty();
+    for (var i = 0; i < this.pointer.children.length; i++) {
+        this.insert(this.pointer.children[i]);
+    }
+};
+
+Finder.prototype.insert = function(node) {
+    var element = $('<div class="icon" data-path="' + filesystem.absolute_path(node) + '">' + node.key + '</div>');
+    if (node.type === 'directory') {
+        element.addClass('documents');
+    } else if (node.type === 'file') {
+        element.addClass('sublimetext');
+    }
+    this.dom.find('main').append(element);
+};
+
+Finder.prototype.icons_handler = function(e) {
+    var icon = $(e.target);
+    if (icon.hasClass('documents')) {
+        this.location(filesystem.resolve_path(icon.data('path')));
+    } else if (icon.hasClass('sublimetext')) {
+
     }
 };
 
