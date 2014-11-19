@@ -95,6 +95,25 @@ var components = {
             var target = windows.instance($(this).closest('.window'));
             target.huds_handler(e);
         });
+
+        windows.desktop.on('focus', '.window input', function(e) {
+            $(this).attr('data-value', $(this).val());
+        });
+
+        windows.desktop.on('keydown', '.window input', function(e) {
+            $(this).removeClass('error');
+            if (e.keyCode === 27) {
+                $(this).val($(this).data('value')).trigger('blur');
+            } else if (e.keyCode === 13) {
+                $(this).trigger('blur');
+                var target = windows.instance($(this).closest('.window'));
+                target.huds_handler(e);
+            }
+        });
+
+        windows.desktop.on('mousedown', function(e) {
+            $('.window input').removeClass('error');
+        });
     }
 };
 
@@ -344,6 +363,13 @@ Finder.prototype.huds_handler = function(e) {
         this.navigate('back');
     } else if (target.hasClass('forward') && !target.hasClass('disabled')) {
         this.navigate('forward');
+    } else if (target.is('[name="path"]')) {
+        try {
+            var destination = filesystem.resolve_path(target.val());
+            this.location(destination);
+        } catch (e) {
+            target.addClass('error').trigger('focus');
+        }
     }
 };
 
