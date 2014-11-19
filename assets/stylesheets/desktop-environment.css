@@ -31,7 +31,7 @@ html {
 
 
 
-/** GENERIC STYLES **/
+/** UTILITY CLASSES **/
 .hidden {
     display: none;
 }
@@ -106,9 +106,55 @@ html {
 
 
 /** CUSTOM WINDOW OVERRIDES **/
+.finder header {
+    height: 60px;
+}
+
+.finder .action-bar {
+    width: calc(100% + 10px);
+    height: 30px;
+    font-size: 0;
+    padding: 0 10px;
+    margin: 30px 0 0 -10px;
+    background-color: #eeeeee;
+    box-shadow: 0 1px 0 rgba(14, 14, 14, 0.3);
+}
+
+.finder input[type="text"] {
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+    width: 28px;
+    height: 22px;
+    font: normal 1.2rem "Consolas", monospace;
+    color: #888888;
+    background-color: #ffffff;
+    border: none;
+    border-radius: 3px;
+    padding: 0 5px;
+    box-shadow: 0 1px 1px rgba(40, 40, 40, 0.25);
+    outline: none;
+}
+
+.finder input[type="text"]:focus {
+    top: 1px;
+    color: #333333;
+    box-shadow: 0 0 1px rgba(40, 40, 40, 0.25);
+}
+
+.finder input[name="path"] {
+    width: 355px;
+    margin-left: 10px;
+}
+
+.finder input[name="search"] {
+    width: 180px;
+    margin: 0 10px;
+}
+
 .finder aside {
     position: absolute;
-    top: 1px;
+    top: 31px;
     left: 0;
     bottom: 0;
     width: 200px;
@@ -146,6 +192,7 @@ html {
 }
 
 .finder main {
+    top: 30px;
     left: auto;
     width: calc(100% - 200px);
 }
@@ -300,4 +347,71 @@ html {
 
 .icon.sublimetext:before {
     background-image: url("../images/sublimetext.png");
+}
+
+.action-button {
+    position: relative;
+    display: inline-block;
+    width: 28px;
+    height: 22px;
+    background-color: #ffffff;
+    border-radius: 3px;
+    box-shadow: 0 1px 1px rgba(40, 40, 40, 0.25);
+    cursor: pointer;
+}
+
+.action-button:before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: transparent center center no-repeat;
+    background-size: 80% auto;
+    opacity: 0.5;
+}
+
+.action-button:active,
+.action-button.pressed {
+    top: 1px;
+    background-color: #fafafa;
+    box-shadow: 0 0 1px rgba(40, 40, 40, 0.25);
+}
+
+.action-button[data-icon="back"]:before {
+    background-image: url("../images/left.png");
+}
+
+.action-button[data-icon="forward"]:before {
+    background-image: url("../images/right.png");
+}
+
+.action-button[data-icon="grid"]:before {
+    background-image: url("../images/grid.png");
+    background-size: 60% auto;
+}
+
+.action-button[data-icon="list"]:before {
+    background-image: url("../images/list.png");
+    background-size: 70% auto;
+}
+
+.button-group {
+    display: inline-block;
+    font-size: 0;
+}
+
+.button-group .action-button {
+    margin-right: 1px;
+    border-radius: 0;
+}
+
+.button-group .action-button:first-child {
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+}
+
+.button-group .action-button:last-child {
+    margin-right: 0;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
 }

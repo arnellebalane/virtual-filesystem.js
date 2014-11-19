@@ -10,10 +10,41 @@
             <div class="icon launchpad" data-application="finder">Finder</div>
             <div class="icon terminal" data-application="terminal">Terminal</div>
             <div class="icon textedit" data-application="textedit">TextEdit</div>
+            <section class="window finder" data-application="finder" data-title="Finder - Folder Name">
+                <header>
+                    <span class="action close"></span>
+                    <span class="action minimize"></span>
+                    <span class="action maximize"></span>
+                    <div class="action-bar">
+                        <div class="button-group">
+                            <span class="action-button back" data-icon="back"></span>
+                            <span class="action-button forward" data-icon="forward"></span>
+                        </div>
+                        <input type="text" name="path">
+                        <input type="text" name="search" placeholder="Search">
+                        <div class="button-group">
+                            <span class="action-button grid" data-icon="grid"></span>
+                            <span class="action-button list" data-icon="list"></span>
+                        </div>
+                    </div>
+                </header>
+                <aside>
+                    <section>
+                        <h1>File System</h1>
+                        <ul>
+                            <li>Documents</li>
+                            <li>Pictures</li>
+                            <li>Music</li>
+                            <li>Videos</li>
+                        </ul>
+                    </section>
+                </aside>
+                <main></main>
+            </section>
         </div>
         
         <template id="finder">
-            <section class="window finder" data-application="finder" data-title="Finder - Folder Name">
+            <section class="window finder" data-application="finder" data-title="Finder">
                 <header>
                     <span class="action close"></span>
                     <span class="action minimize"></span>

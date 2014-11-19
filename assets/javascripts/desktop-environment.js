@@ -133,6 +133,10 @@ var windows = {
             start = { x: 0, y: 0 };
             origin = { x: 0, y: 0 };
         });
+
+        windows.desktop.on('mousedown', '.window header .action-bar > *', function(e) {
+            e.stopPropagation();
+        });
     },
     close: function(target) {
         target.dom.remove();
