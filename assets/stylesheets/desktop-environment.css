@@ -124,7 +124,7 @@ html {
     box-shadow: 0 1px 0 rgba(14, 14, 14, 0.3);
 }
 
-.finder input[type="text"] {
+.finder input {
     position: relative;
     display: inline-block;
     vertical-align: top;
@@ -140,7 +140,7 @@ html {
     outline: none;
 }
 
-.finder input[type="text"]:focus {
+.finder input:focus {
     color: #333333;
 }
 
@@ -349,6 +349,19 @@ html {
 
 .icon.sublimetext:before {
     background-image: url("../images/sublimetext.png");
+}
+
+.icon textarea {
+    display: block;
+    width: 100%;
+    height: 12px;
+    font: normal 1.2rem/1 "Consolas", monospace;
+    text-align: center;
+    border: none;
+    border-radius: 2px;
+    padding: none;
+    resize: none;
+    outline: none;
 }
 
 .action-button {

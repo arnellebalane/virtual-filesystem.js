@@ -77,6 +77,7 @@ var components = {
     textareas: function() {
         windows.desktop.on('keydown', 'textarea', function(e) {
             var target = windows.instance($(this).closest('.window'));
+            console.log($(this));
             if (e.keyCode === 9) {
                 e.preventDefault();
             } else if (e.keyCode === 13 && $(this).attr('data-capture-enter') === 'true') {
@@ -86,7 +87,7 @@ var components = {
                 e.preventDefault();
                 target.keyboard_handler(e);
             } else if ($(this).hasClass('autosize')) {
-                target.autosize(e);
+                target.textarea_handler(e);
             }
         });
     },
@@ -226,6 +227,14 @@ var templates = {
     textedit: $('template#textedit').html()
 };
 
+// UTILITY METHODS
+var util = {
+    autosize: function(target) {
+        target.css('height', 'auto');
+        target.css('height', target[0].scrollHeight + 'px');
+    }
+};
+
 // WINDOW CLASSES
 function Class() {}
 
@@ -248,6 +257,7 @@ Class.extend(Window);
 
 Window.prototype.focus = function() {};
 Window.prototype.keyboard_handler = function() {};
+Window.prototype.textarea_handler = function() {};
 Window.prototype.icons_handler = function() {};
 Window.prototype.huds_handler = function() {};
 
@@ -351,6 +361,31 @@ Finder.prototype.insert = function(node) {
     this.dom.find('main').append(element);
 };
 
+Finder.prototype.create = function(type) {
+    var node = $('<div class="icon highlighted"><textarea name="node" class="autosize"></textarea></div>');
+    node.attr('data-capture-enter', 'true');
+    if (type === 'directory') {
+        node.addClass('documents');
+    } else if (type === 'file') {
+        node.addClass('sublimetext');
+    }
+    this.dom.find('main').append(node);
+    setTimeout(function() {
+        node.find('textarea').trigger('focus');
+    }, 0);
+};
+
+Finder.prototype.textarea_handler = function(e) {
+    var target = $(e.target);
+    console.info(target);
+    if (target.hasClass('autosize')) {
+        var self = this;
+        setTimeout(function() {
+            util.autosize(self.dom.find('textarea'));
+        }, 0);
+    }
+};
+
 Finder.prototype.icons_handler = function(e) {
     var icon = $(e.target);
     if (icon.hasClass('documents')) {
@@ -373,6 +408,10 @@ Finder.prototype.huds_handler = function(e) {
         } catch (e) {
             target.addClass('error').trigger('focus');
         }
+    } else if (target.is('.action-button.folder')) {
+        this.create('directory');
+    } else if (target.is('.action-button.file')) {
+        this.create('file');
     }
 };
 
@@ -484,29 +523,26 @@ Terminal.prototype.maximize = function() {
     });
 };
 
-Terminal.prototype.autosize = function(e) {
-    if (e === undefined) {
-        resize(this.input);
-    } else {
-        setTimeout(resize, 0, this.input);
-    }
-    
-    function resize(target) {
-        target.css('height', 'auto');
-        target.css('height', target[0].scrollHeight + 'px');
-    }
-
-    if (this.dom.find('.contents').height() > this.dom.find('main').height()) {
-        this.dom.find('.contents').addClass('overflow');
-    } else {
-        this.dom.find('.contents').removeClass('overflow');
-    }
-};
-
 Terminal.prototype.keyboard_handler = function(e) {
     if (e.keyCode === 83 && e.ctrlKey) {
         var command = this.buffer + ' "' + this.input.val() + '"';
         this.execute(command);
+    }
+};
+
+Terminal.prototype.textarea_handler = function(e) {
+    var target = $(e.target);
+    if (target.hasClass('autosize')) {
+        if (e === undefined) {
+            util.autosize(this.input);
+        } else {
+            setTimeout(util.autosize, 0, this.input);
+        }
+        if (this.dom.find('.contents').height() > this.dom.find('main').height()) {
+            this.dom.find('.contents').addClass('overflow');
+        } else {
+            this.dom.find('.contents').removeClass('overflow');
+        }
     }
 };
 
