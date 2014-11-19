@@ -392,14 +392,14 @@ html {
     background-image: url("../images/right.png");
 }
 
-.action-button[data-icon="grid"]:before {
-    background-image: url("../images/grid.png");
+.action-button[data-icon="folder"]:before {
+    background-image: url("../images/folder.png");
     background-size: 60% auto;
 }
 
-.action-button[data-icon="list"]:before {
-    background-image: url("../images/list.png");
-    background-size: 70% auto;
+.action-button[data-icon="file"]:before {
+    background-image: url("../images/file.png");
+    background-size: 60% auto;
 }
 
 .button-group {
