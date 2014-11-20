@@ -131,8 +131,8 @@ var windows = {
         windows.draggable();
         windows.actions();
     },
-    spawn: function(application) {
-        application = applications[application]();
+    spawn: function(application, path) {
+        application = applications[application](path);
         var key = $('.window').length;
         windows.instances[key] = application;
         application.dom.attr('data-instance', key);
@@ -222,7 +222,7 @@ var applications = {
         return new Terminal(filesystem.resolve_path(path));
     },
     textedit: function(path) {
-        return new TextEdit(filesystem.resolve_path(path));
+        return new TextEdit(path ? path : filesystem.resolve_path(path));
     }
 };
 
@@ -406,7 +406,7 @@ Finder.prototype.icons_handler = function(e) {
     if (target.hasClass('documents')) {
         this.location(filesystem.resolve_path(target.data('path')));
     } else if (target.hasClass('sublimetext')) {
-        // open file with textedit
+        windows.spawn('textedit', target.data('path'));
     }
 };
 
@@ -637,10 +637,21 @@ function TextEdit(pointer) {
     this.max_width = 450;
     this.max_height = 550;
     this.dom = $(templates.textedit);
-    this.pointer = pointer;
+    this.pointer = null;
+
+    if (pointer !== undefined) {
+        this.open(pointer);
+    }
 }
 Window.extend(TextEdit);
 
 TextEdit.prototype.focus = function() {
     this.dom.find('textarea').focus();
+};
+
+TextEdit.prototype.open = function(file) {
+    file = typeof file === 'object' ? file : filesystem.resolve_path(file);
+    this.pointer = file;
+    this.dom.attr('data-title', 'TextEdit - ' + file.key);
+    this.dom.find('textarea').val(file.contents);
 };
