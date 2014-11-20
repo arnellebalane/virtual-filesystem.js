@@ -81,7 +81,7 @@ var components = {
                 e.preventDefault();
             } else if (e.keyCode === 13 && $(this).attr('data-capture-enter') === 'true') {
                 e.preventDefault();
-                target.execute();
+                target.textarea_handler(e);
             } else if (e.keyCode === 83 && e.ctrlKey) {
                 e.preventDefault();
                 target.keyboard_handler(e);
@@ -527,14 +527,14 @@ Terminal.prototype.focus = function() {
 Terminal.prototype.minimize = function() {
     var self = this;
     Window.prototype.minimize.call(self, function() {
-        self.autosize();
+        util.autosize(self.input);
     });
 };
 
 Terminal.prototype.maximize = function() {
     var self = this;
     Window.prototype.maximize.call(self, function() {
-        self.autosize();
+        util.autosize(self.input);
     });
 };
 
@@ -547,7 +547,9 @@ Terminal.prototype.keyboard_handler = function(e) {
 
 Terminal.prototype.textarea_handler = function(e) {
     var target = $(e.target);
-    if (target.hasClass('autosize')) {
+    if (e.keyCode === 13 && target.attr('data-capture-enter') === 'true') {
+        this.execute();
+    } else if (target.hasClass('autosize')) {
         if (e === undefined) {
             util.autosize(this.input);
         } else {
