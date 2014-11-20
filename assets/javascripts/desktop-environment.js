@@ -230,7 +230,8 @@ var applications = {
 var templates = {
     finder: $('template#finder').html(),
     terminal: $('template#terminal').html(),
-    textedit: $('template#textedit').html()
+    textedit: $('template#textedit').html(),
+    alert: $('template#alert').html()
 };
 
 // UTILITY METHODS
@@ -238,6 +239,23 @@ var util = {
     autosize: function(target) {
         target.css('height', 'auto');
         target.css('height', target[0].scrollHeight + 'px');
+    },
+    alert: function(message) {
+        var template = $(templates.alert);
+        var overlay = $('<div class="alert-overlay"></div>');
+        template.find('p').text(message);
+        windows.desktop.append(overlay);
+        windows.desktop.append(template);
+        template.css({
+            'top': (window.innerHeight - 3 * template.height()) / 2 + 'px',
+            'left': (window.innerWidth - template.width()) / 2 + 'px'
+        });
+
+        template.find('.action').on('mousedown', function(e) {
+            e.stopPropagation();
+            overlay.remove();
+            template.remove();
+        });
     }
 };
 
@@ -384,20 +402,34 @@ Finder.prototype.create = function(type) {
 Finder.prototype.textarea_handler = function(e) {
     var target = $(e.target);
     if (e.type === 'keydown' && target.hasClass('autosize')) {
-        var self = this;
-        setTimeout(function() {
-            util.autosize(self.dom.find('textarea'));
-        }, 0);
+        if (e.keyCode === 13) {
+            this.dom.find('textarea').trigger('blur');
+        } else {
+            var self = this;
+            setTimeout(function() {
+                util.autosize(self.dom.find('textarea'));
+            }, 0);
+        }
     } else if (e.type === 'blur' || e.type === 'focusout') {
         var path = filesystem.absolute_path(this.pointer);
         if (!target.val().length) {
             target.parent().remove();
         } else if (target.parent().hasClass('documents')) {
-            filesystem.instance.mkdir(path + '/' + target.val());
-            this.refresh();
+            try {
+                filesystem.instance.mkdir(path + '/' + target.val());
+                this.refresh();
+            } catch (e) {
+                target.parent().remove();
+                util.alert(e.message);
+            }
         } else if (target.parent().hasClass('sublimetext')) {
-            filesystem.instance.cat('>', path + '/' + target.val(), '');
-            this.refresh();
+            try {
+                filesystem.instance.cat('>', path + '/' + target.val(), '');
+                this.refresh();
+            } catch (e) {
+                target.parent().remove();
+                util.alert(e.message);
+            }
         }
     }
 };
