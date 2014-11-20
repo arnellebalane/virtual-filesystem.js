@@ -77,7 +77,6 @@ var components = {
     textareas: function() {
         windows.desktop.on('keydown', 'textarea', function(e) {
             var target = windows.instance($(this).closest('.window'));
-            console.log($(this));
             if (e.keyCode === 9) {
                 e.preventDefault();
             } else if (e.keyCode === 13 && $(this).attr('data-capture-enter') === 'true') {
@@ -90,9 +89,15 @@ var components = {
                 target.textarea_handler(e);
             }
         });
+
+        windows.desktop.on('blur', '.window .icon textarea', function(e) {
+            var target = windows.instance($(this).closest('.window'));
+            target.textarea_handler(e);
+        });
     },
     huds: function() {
         windows.desktop.on('mousedown', '.window .action-button', function(e) {
+            $('.icon').removeClass('highlighted');
             var target = windows.instance($(this).closest('.window'));
             target.huds_handler(e);
         });
@@ -377,20 +382,30 @@ Finder.prototype.create = function(type) {
 
 Finder.prototype.textarea_handler = function(e) {
     var target = $(e.target);
-    console.info(target);
-    if (target.hasClass('autosize')) {
+    if (e.type === 'keydown' && target.hasClass('autosize')) {
         var self = this;
         setTimeout(function() {
             util.autosize(self.dom.find('textarea'));
         }, 0);
+    } else if (e.type === 'blur' || e.type === 'focusout') {
+        var path = filesystem.absolute_path(this.pointer);
+        if (!target.val().length) {
+            target.parent().remove();
+        } else if (target.parent().hasClass('documents')) {
+            filesystem.instance.mkdir(path + '/' + target.val());
+            this.refresh();
+        } else if (target.parent().hasClass('sublimetext')) {
+            filesystem.instance.cat('>', path + '/' + target.val(), '');
+            this.refresh();
+        }
     }
 };
 
 Finder.prototype.icons_handler = function(e) {
-    var icon = $(e.target);
-    if (icon.hasClass('documents')) {
-        this.location(filesystem.resolve_path(icon.data('path')));
-    } else if (icon.hasClass('sublimetext')) {
+    var target = $(e.target);
+    if (target.hasClass('documents')) {
+        this.location(filesystem.resolve_path(target.data('path')));
+    } else if (target.hasClass('sublimetext')) {
         // open file with textedit
     }
 };
