@@ -83,7 +83,10 @@ var components = {
             } else if (e.keyCode === 13 && $(this).attr('data-capture-enter') === 'true') {
                 e.preventDefault();
                 target.textarea_handler(e);
-            } else if (e.keyCode === 83 && e.ctrlKey) {
+            } else if (e.ctrlKey && (e.keyCode === 76 || e.keyCode === 68)) {
+                e.preventDefault();
+                target.keyboard_handler(e);
+            } else if (e.ctrlKey && e.keyCode === 83) {
                 e.preventDefault();
                 target.keyboard_handler(e);
             } else if ($(this).hasClass('autosize')) {
@@ -546,6 +549,12 @@ function Terminal(pointer) {
             } else {
                 this.log('No results found: ' + query, 'red');
             }
+        },
+        clear: function() {
+            this.dom.find('main p').remove();
+        },
+        exit: function() {
+            windows.close(this);
         }
     };
 
@@ -572,9 +581,15 @@ Terminal.prototype.maximize = function() {
 };
 
 Terminal.prototype.keyboard_handler = function(e) {
-    if (e.keyCode === 83 && e.ctrlKey) {
-        var command = this.buffer + ' "' + this.input.val() + '"';
-        this.execute(command);
+    if (e.ctrlKey) {
+        if (e.keyCode === 83) {
+            var command = this.buffer + ' "' + this.input.val() + '"';
+            this.execute(command);
+        } else if (e.keyCode === 76) {
+            this.intercepts.clear.apply(this);
+        } else if (e.keyCode === 68) {
+            this.intercepts.exit.apply(this);
+        }
     }
 };
 
