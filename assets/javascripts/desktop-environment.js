@@ -64,6 +64,7 @@ var components = {
         });
 
         windows.desktop.on('dblclick', '.window .icon', function(e) {
+            $(this).removeClass('highlighted');
             var target = windows.instance($(this).closest('.window'));
             target.icons_handler(e);
         });
@@ -222,7 +223,7 @@ var applications = {
         return new Terminal(filesystem.resolve_path(path));
     },
     textedit: function(path) {
-        return new TextEdit(path ? path : filesystem.resolve_path(path));
+        return new TextEdit(path ? filesystem.resolve_path(path) : path);
     }
 };
 
@@ -654,4 +655,17 @@ TextEdit.prototype.open = function(file) {
     this.pointer = file;
     this.dom.attr('data-title', 'TextEdit - ' + file.key);
     this.dom.find('textarea').val(file.contents);
+};
+
+TextEdit.prototype.keyboard_handler = function(e) {
+    var target = $(e.target);
+    if (e.ctrlKey && e.keyCode === 83) {
+        e.preventDefault();
+        if (this.pointer === null) {
+
+        } else {
+            var path = filesystem.absolute_path(this.pointer);
+            filesystem.instance.cat('>', path, this.dom.find('textarea').val());
+        }
+    }
 };
