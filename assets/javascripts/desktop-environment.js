@@ -297,8 +297,11 @@ var system = {
     invoke_contextmenu: function(e) {
         var target = $(e.target);
         if (target.closest('.finder').length) {
+            // @todo clean this up later
             system.contextmenu_target = $('.icon.highlighted');
-            system.contextmenu.css({ 'top': e.pageY + 'px', 'left': e.pageX + 'px' }).removeClass('hidden');
+            if (system.contextmenu_target.length) {
+                system.contextmenu.css({ 'top': e.pageY + 'px', 'left': e.pageX + 'px' }).removeClass('hidden');
+            }
         }
     }
 };
@@ -463,8 +466,11 @@ Finder.prototype.refresh = function() {
         this.insert(this.pointer.children[i]);
     }
     for (var i = 0; i < Window.favorites.length; i++) {
-        var favorite = filesystem.resolve_path(Window.favorites[i]);
-        this.dom.find('.favorites').append('<li data-path="' + Window.favorites[i] + '">' + favorite.key + '</li>');
+        // @todo clean this up later
+        try {
+            var favorite = filesystem.resolve_path(Window.favorites[i]);
+            this.dom.find('.favorites').append('<li data-path="' + Window.favorites[i] + '">' + favorite.key + '</li>');
+        } catch (e) {}
     }
     if (this.cursor === 0) {
         this.dom.find('.action-button.back').addClass('disabled');
