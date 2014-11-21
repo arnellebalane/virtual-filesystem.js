@@ -594,7 +594,8 @@ Finder.prototype.huds_handler = function(e) {
             this.dom.find('.action-bar .action-button').addClass('disabled');
             this.dom.find('.action-bar .action-button.back').removeClass('disabled');
             var node = results[i];
-            var result = $('<div class="icon" data-path="' + filesystem.absolute_path(node) + '">' + node.key + '</div>');
+            var path = filesystem.absolute_path(node);
+            var result = $('<div class="icon" data-path="' + path + '" title="' + path + '">' + node.key + '</div>');
             if (node.type === 'directory') {
                 result.addClass('documents');
             } else if (node.type === 'file') {
