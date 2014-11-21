@@ -472,6 +472,7 @@ Finder.prototype.refresh = function() {
             this.dom.find('.favorites').append('<li data-path="' + Window.favorites[i] + '">' + favorite.key + '</li>');
         } catch (e) {}
     }
+    this.dom.find('.action-button.folder, .action-button.file').removeClass('disabled');
     if (this.cursor === 0) {
         this.dom.find('.action-button.back').addClass('disabled');
     } else {
@@ -589,6 +590,7 @@ Finder.prototype.huds_handler = function(e) {
     } else if (target.is('[name="search"]')) {
         var results = filesystem.instance.whereis(target.val());
         this.dom.find('main').empty();
+        this.dom.find('.action-button.folder, .action-button.file').addClass('disabled');
         for (var i = 0; i < results.length; i++) {
             this.cursor++;
             this.dom.find('.action-bar .action-button').addClass('disabled');
