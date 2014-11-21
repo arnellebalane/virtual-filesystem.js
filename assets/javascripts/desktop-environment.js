@@ -250,6 +250,7 @@ var util = {
         target.css('height', target[0].scrollHeight + 'px');
     },
     alert: function(message) {
+        $('.window').removeClass('focused');
         var template = $(templates.alert);
         var overlay = $('<div class="overlay"></div>');
         template.find('p').text(message);
@@ -264,6 +265,7 @@ var util = {
             e.stopPropagation();
             overlay.remove();
             template.remove();
+            windows.desktop.find('.window').last().addClass('focused');
         });
     }
 };
@@ -773,9 +775,12 @@ FileBrowser.prototype.icons_handler = function(e) {
 };
 
 FileBrowser.prototype.huds_handler = function(e) {
+    e.stopPropagation();
     var input = this.dom.find('input');
     var filename = input.val().trim();
-    if (!filename.length || this.pointer.find(filename) !== null) {
+    if (!filename.length) {
+        util.alert('Please enter a name for the file.');
+    } else if (this.pointer.find(filename) !== null) {
         util.alert('Name already taken: ' + filename);
     } else {
         this.application.dom.data('path', filesystem.absolute_path(this.pointer) + '/' + filename);
