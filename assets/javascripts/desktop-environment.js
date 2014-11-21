@@ -30,6 +30,8 @@ var filesystem = {
         filesystem.instance.cat('>', 'Documents/Codes/Javascript/script.js', 'this is another sample javascript file');
         filesystem.instance.cat('>', 'Documents/Codes/Python/sample.py', 'this is a sample python file');
         filesystem.instance.cat('>', 'Documents/Codes/Ruby/sample.rb', 'this is a sample ruby file');
+
+        Window.favorites = ['/Documents', '/Pictures', '/Music', 'Videos'];
     },
     resolve_path: function(path) {
         return path === undefined ? filesystem.instance.tree.root : filesystem.instance._resolve_path(path);
@@ -137,6 +139,13 @@ var windows = {
         windows.focus();
         windows.draggable();
         windows.actions();
+
+        // transfer this later
+        windows.desktop.on('click', '.favorites li', function(e) {
+            var target = windows.instance($(this).closest('.window'));
+            var node = filesystem.resolve_path($(this).data('path'));
+            target.location(node);
+        });
     },
     spawn: function(application, path) {
         application = applications[application](path);
@@ -409,6 +418,10 @@ function Finder(pointer) {
 }
 Window.extend(Finder);
 
+// favorites in finder sidebar. transfer this
+// to a better location later
+Window.favorites = [];
+
 Finder.prototype.maximize = function() {
     if (!this.dom.hasClass('maximize')) {
         this.dom.animate({
@@ -445,8 +458,13 @@ Finder.prototype.refresh = function() {
     var path = filesystem.absolute_path(this.pointer);
     this.address_bar.val(path ? path : '/');
     this.dom.find('main').empty();
+    this.dom.find('.favorites').empty();
     for (var i = 0; i < this.pointer.children.length; i++) {
         this.insert(this.pointer.children[i]);
+    }
+    for (var i = 0; i < Window.favorites.length; i++) {
+        var favorite = filesystem.resolve_path(Window.favorites[i]);
+        this.dom.find('.favorites').append('<li data-path="' + Window.favorites[i] + '">' + favorite.key + '</li>');
     }
     if (this.cursor === 0) {
         this.dom.find('.action-button.back').addClass('disabled');
