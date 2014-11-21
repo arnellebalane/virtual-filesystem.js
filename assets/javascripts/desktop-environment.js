@@ -230,8 +230,8 @@ var system = {
         $(document).on('keyup', function(e) {
             if (e.keyCode === 67 || e.keyCode === 88 || e.keyCode === 86) {
                 system.invoke_clipboard(e.keyCode);
-            } else if (e.keyCode === 86) {
-                
+            } else if (e.keyCode === 46) {
+                system.invoke_deletion();
             }
         });
     },
@@ -260,6 +260,16 @@ var system = {
                 system.clipboard_sources = [];
             }
         }
+    },
+    invoke_deletion: function() {
+        $('.window .icon.highlighted').each(function() {
+            if ($(this).hasClass('documents')) {
+                filesystem.instance.rmdir($(this).data('path'));
+            } else if ($(this).hasClass('sublimetext')) {
+                filesystem.instance.rm($(this).data('path'));
+            }
+            $(this).remove();
+        });
     }
 };
 
