@@ -2,6 +2,7 @@ $(document).ready(function() {
     filesystem.initialize();
     components.initialize();
     windows.initialize();
+    clipboard.initialize();
 });
 
 var filesystem = {
@@ -157,10 +158,10 @@ var windows = {
                 if (target.hasOwnProperty('pointer')) {
                     filesystem.instance.pointer = target.pointer;
                 }
+                setTimeout(function() {
+                    target.focus();
+                }, 0);
             }
-            setTimeout(function() {
-                target.focus();
-            }, 0);
         }
     },
     draggable: function() {
@@ -217,6 +218,31 @@ var windows = {
     },
     instance: function(target) {
         return windows.instances[target.data('instance')];
+    }
+};
+
+var clipboard = {
+    cache: [],
+    operation: null,
+    operations: { 67: 'cp', 88: 'mv' },
+    initialize: function() {
+        $(document).on('keyup', function(e) {
+            if (e.keyCode === 67 || e.keyCode === 88) {
+                clipboard.cache = [];
+                clipboard.operation = clipboard.operations[e.keyCode];
+                $('.window .icon.highlighted').each(function() {
+                    clipboard.cache.push($(this).data('path'));
+                });
+            } else if (e.keyCode === 86) {
+                var target = windows.instance($('.window.focused'));
+                if (target && target instanceof Finder) {
+                    for (var i = 0; i < clipboard.cache.length; i++) {
+                        filesystem.instance[clipboard.operation](clipboard.cache[i], target.pointer);
+                    }
+                    target.refresh();
+                }
+            }
+        });
     }
 };
 
@@ -335,6 +361,10 @@ function Finder(pointer) {
 }
 Window.extend(Finder);
 
+Finder.prototype.focus = function() {
+    this.refresh();
+};
+
 Finder.prototype.maximize = function() {
     if (!this.dom.hasClass('maximize')) {
         this.dom.animate({
@@ -363,7 +393,6 @@ Finder.prototype.navigate = function(direction) {
     } else if (direction === 'forward') {
         this.pointer = this.history[++this.cursor];
     }
-    this.refresh();
 };
 
 Finder.prototype.refresh = function() {
