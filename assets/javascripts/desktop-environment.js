@@ -462,6 +462,20 @@ Finder.prototype.refresh = function() {
     this.address_bar.val(path ? path : '/');
     this.dom.find('main').empty();
     this.dom.find('.favorites').empty();
+    // @todo clean this up later
+    this.pointer.children.sort(function(a, b) {
+        if (a.type === 'directory' && b.type === 'file') {
+            return -1;
+        } else if (a.type === 'file' && b.type === 'directory') {
+            return 1;
+        }
+        if (a.key < b.key) {
+            return -1;
+        } else if (a.key > b.key) {
+            return 1;
+        }
+        return 0;
+    });
     for (var i = 0; i < this.pointer.children.length; i++) {
         this.insert(this.pointer.children[i]);
     }
