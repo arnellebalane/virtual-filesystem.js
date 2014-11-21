@@ -538,7 +538,8 @@ Finder.prototype.icons_handler = function(e) {
     if (target.hasClass('documents')) {
         this.location(filesystem.resolve_path(target.data('path')));
     } else if (target.hasClass('sublimetext')) {
-        windows.spawn('textedit', target.data('path'));
+        var editor = windows.spawn('textedit', target.data('path'));
+        editor.dom.attr('data-path', filesystem.absolute_path(editor.pointer));
     } else if (e.type === 'click') {
         system.contextmenu.addClass('hidden');
         var target = system.contextmenu_target;
@@ -824,7 +825,12 @@ TextEdit.prototype.open = function(file) {
 
 TextEdit.prototype.save = function() {
     var path = this.dom.data('path');
-    filesystem.instance.cat('>', path, this.dom.find('textarea').val());
+    try {
+        var node = filesystem.resolve_path(path);
+        node.contents = this.dom.find('textarea').val();
+    } catch (e) {
+        filesystem.instance.cat('>', path, this.dom.find('textarea').val());
+    }
     this.open(path);
 };
 
@@ -837,7 +843,7 @@ TextEdit.prototype.keyboard_handler = function(e) {
             var filebrowser = windows.spawn('filebrowser');
             filebrowser.target(this);
         } else {
-            this.dom.data('path', filesystem.absolute_path(this.pointer));
+            this.dom.attr('data-path', filesystem.absolute_path(this.pointer));
             this.save();
         }
     }
@@ -893,7 +899,7 @@ FileBrowser.prototype.huds_handler = function(e) {
     } else if (this.pointer.find(filename).length) {
         util.alert('Name already taken: ' + filename);
     } else {
-        this.application.dom.data('path', filesystem.absolute_path(this.pointer) + '/' + filename);
+        this.application.dom.attr('data-path', filesystem.absolute_path(this.pointer) + '/' + filename);
         this.application.save();
         windows.close(this);
     }
