@@ -17,7 +17,7 @@
             var segments = path.replace(/\/+$/g, '').split('/');
             var parent = this._resolve_path(segments.slice(0, segments.length - 1).join('/'));
             var name = segments[segments.length - 1];
-            if (parent.find(name) !== null) {
+            if (parent.find(name).length) {
                 throw new Error('Name already taken: ' + name);
             }
             this.tree.insert(name, parent, { type: 'directory' });
@@ -56,16 +56,16 @@
             var segments = path.replace(/\/+$/g, '').split('/');
             var parent = this._resolve_path(segments.slice(0, segments.length - 1).join('/'));
             var name = segments[segments.length - 1];
-            var node = parent.find(name);
-            if (node !== null && node.type !== 'file') {
+            var node = parent.find(name)[0];
+            if (node && node.type !== 'file') {
                 throw new Error('Not a file: ' + path);
             } else if (mode.length) {
-                if (node === null) {
+                if (node === undefined) {
                     node = this.tree.insert(name, parent, { type: 'file', contents: '' });
                 }
                 node.contents = mode === '>' ? contents : node.contents + contents;
             } else {
-                if (node === null) {
+                if (node === undefined) {
                     throw new Error('File not found: ' + path);
                 }
                 return node.contents;
@@ -93,7 +93,7 @@
             if (node === this.tree.root) {
                 throw new Error('You cannot rename the root directory.');
             }
-            var search = node.parent.find(name);
+            var search = node.parent.find(name)[0];
             if (search && search.type === node.type) {
                 throw new Error('Rename failed. Name already taken.');
             }
@@ -157,8 +157,8 @@
                     }
                     parent = parent.parent;
                 } else if (path[i] !== '.' && path[i].length) {
-                    parent = parent.find(path[i]);
-                    if (parent === null) {
+                    parent = parent.find(path[i])[0];
+                    if (parent === undefined) {
                         throw new Error('Path not found: ' + path.slice(0, i + 1).join('/'));
                     }
                 }

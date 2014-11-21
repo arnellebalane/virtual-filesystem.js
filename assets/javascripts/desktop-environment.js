@@ -833,7 +833,7 @@ FileBrowser.prototype.huds_handler = function(e) {
     var filename = input.val().trim();
     if (!filename.length) {
         util.alert('Please enter a name for the file.');
-    } else if (this.pointer.find(filename) !== null) {
+    } else if (this.pointer.find(filename).length) {
         util.alert('Name already taken: ' + filename);
     } else {
         this.application.dom.data('path', filesystem.absolute_path(this.pointer) + '/' + filename);

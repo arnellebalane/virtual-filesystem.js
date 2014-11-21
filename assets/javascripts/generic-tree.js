@@ -99,12 +99,13 @@
         };
 
         this.find = function(key) {
+            var results = [];
             for (var i in this.children) {
-                if (key === this.children[i].key) {
-                    return this.children[i];
+                if (this.children[i].key.match('^' + key.replace(/\./g, '\\.').replace(/\*/g, '\.\*') + '$')) {
+                    results.push(this.children[i]);
                 }
             }
-            return null;
+            return results;
         };
     }
 
