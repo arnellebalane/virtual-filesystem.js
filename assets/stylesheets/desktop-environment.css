@@ -315,7 +315,7 @@ input:focus {
 .alert {
     width: 300px;
     height: auto;
-    z-index: 4;
+    z-index: 3;
 }
 
 .alert:before {
@@ -348,8 +348,9 @@ input:focus {
 }
 
 .filebrowser {
-    width: 400px;
+    width: 350px;
     height: 250px;
+    z-index: 3;
 }
 
 .filebrowser ul {
@@ -376,7 +377,7 @@ input:focus {
 
 .filebrowser input {
     float: left;
-    width: 286px;
+    width: 236px;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
     margin-right: 1px;
@@ -428,7 +429,8 @@ input:focus {
     text-align: left;
     margin: 1px 0;
     border-radius: 0;
-    padding: 4px 10px 2px 10px;
+    padding: 4px 10px 2px 30px;
+    position: relative;
 }
 
 .icon.list:nth-of-type(2n) {
@@ -436,7 +438,14 @@ input:focus {
 }
 
 .icon.list:before {
-    display: none;
+    position: absolute;
+    top: 2px;
+    left: 10px;
+    width: 14px;
+    height: 14px;
+    padding: 0;
+    background-image: url('../images/folder.png');
+    opacity: 0.5;
 }
 
 .icon.highlighted {

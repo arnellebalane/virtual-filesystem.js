@@ -142,6 +142,7 @@ var windows = {
         application.dom.attr('data-instance', key);
         windows.desktop.append(application.dom);
         windows.focus(application);
+        return application;
     },
     focus: function(target) {
         if (target === undefined) {
@@ -198,6 +199,7 @@ var windows = {
         if (last.length) {
             windows.focus(windows.instance(last));
         }
+        $('.overlay').remove();
     },
     actions: function() {
         windows.desktop.on('mousedown', '.window .action', function(e) {
@@ -237,7 +239,7 @@ var templates = {
     finder: $('template#finder').html(),
     terminal: $('template#terminal').html(),
     textedit: $('template#textedit').html(),
-    filebrowser: $('template#filebroser').html(),
+    filebrowser: $('template#filebrowser').html(),
     alert: $('template#alert').html()
 };
 
@@ -708,37 +710,76 @@ TextEdit.prototype.open = function(file) {
     this.dom.find('textarea').val(file.contents);
 };
 
+TextEdit.prototype.save = function() {
+    var path = this.dom.data('path');
+    filesystem.instance.cat('>', path, this.dom.find('textarea').val());
+    this.open(path);
+};
+
 TextEdit.prototype.keyboard_handler = function(e) {
     var target = $(e.target);
     if (e.ctrlKey && e.keyCode === 83) {
         e.preventDefault();
         if (this.pointer === null) {
-
+            windows.desktop.append('<div class="overlay"></div>');
+            var filebrowser = windows.spawn('filebrowser');
+            filebrowser.target(this);
         } else {
-            var path = filesystem.absolute_path(this.pointer);
-            filesystem.instance.cat('>', path, this.dom.find('textarea').val());
+            this.dom.data('path', filesystem.absolute_path(this.pointer));
+            this.save();
         }
     }
 };
 
 function FileBrowser(pointer) {
     this.dom = $(templates.filebrowser);
+    this.application = null;
     this.pointer = null;
 
     this.location(pointer);
 }
 Window.extend(FileBrowser);
 
+FileBrowser.prototype.focus = function(e) {
+    this.dom.find('input').trigger('focus');
+};
+
 FileBrowser.prototype.location = function(location) {
     this.pointer = location;
     var list = this.dom.find('ul').empty();
-    if (this.pointer !== filesystem.instance.tree.root) {
-        list.append('<div class="icon list">' + (up one directory) + '</div>');
+    if (this.pointer.parent !== null) {
+        var path = filesystem.absolute_path(this.pointer.parent);
+        list.append('<div class="icon list" data-path="' + (path.length ? path : '/') + '">(up one directory)</div>');
     }
     for (var i = 0; i < this.pointer.children.length; i++) {
         var child = this.pointer.children[i];
         if (child.type === 'directory') {
-            list.append('<div class="icon list">' + child.key + '</div>');
+            list.append('<div class="icon list" data-path="' + filesystem.absolute_path(child) + '">' + child.key + '</div>');
         }
+    }
+};
+
+FileBrowser.prototype.target = function(application) {
+    this.application = application;
+    this.dom.css({
+        'top': this.application.dom.offset().top + (this.application.dom.height() - this.dom.height()) / 2 + 'px',
+        'left': this.application.dom.offset().left + (this.application.dom.width() - this.dom.width()) / 2 + 'px'
+    });
+};
+
+FileBrowser.prototype.icons_handler = function(e) {
+    var target = $(e.target);
+    this.location(filesystem.resolve_path(target.data('path')));
+};
+
+FileBrowser.prototype.huds_handler = function(e) {
+    var input = this.dom.find('input');
+    var filename = input.val().trim();
+    if (!filename.length || this.pointer.find(filename) !== null) {
+        util.alert('Name already taken: ' + filename);
+    } else {
+        this.application.dom.data('path', filesystem.absolute_path(this.pointer) + '/' + filename);
+        this.application.save();
+        windows.close(this);
     }
 };
