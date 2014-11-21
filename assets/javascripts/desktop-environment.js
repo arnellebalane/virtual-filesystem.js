@@ -74,6 +74,9 @@ var components = {
             if (!$(e.target).hasClass('icon')) {
                 $('.icon').removeClass('highlighted');
             }
+            if (!$(e.target).closest('.contextmenu').length) {
+                $('.contextmenu').addClass('hidden');
+            }
         });
     },
     textareas: function() {
@@ -225,6 +228,8 @@ var system = {
     clipboard_sources: [],
     clipboard_operation: null,
     clipboard_operations: { 67: 'cp', 88: 'mv' },
+    contextmenu: $('.contextmenu'),
+    contextmenu_target: null,
     initialize: function() {
         $(document).on('keyup', function(e) {
             if (e.keyCode === 67 || e.keyCode === 88 || e.keyCode === 86) {
@@ -232,6 +237,16 @@ var system = {
             } else if (e.keyCode === 46) {
                 system.invoke_deletion();
             }
+        });
+
+        $(document).on('contextmenu', function(e) {
+            e.preventDefault();
+            system.invoke_contextmenu(e);
+        });
+
+        $('.contextmenu .rename').on('click', function(e) {
+            var target = windows.instance(system.contextmenu_target.closest('.window'));
+            target.icons_handler(e);
         });
     },
     invoke_clipboard: function(code) {
@@ -269,6 +284,13 @@ var system = {
             }
             $(this).remove();
         });
+    },
+    invoke_contextmenu: function(e) {
+        var target = $(e.target);
+        if (target.closest('.finder').length) {
+            system.contextmenu_target = $('.icon.highlighted');
+            system.contextmenu.css({ 'top': e.pageY + 'px', 'left': e.pageX + 'px' }).removeClass('hidden');
+        }
     }
 };
 
@@ -449,7 +471,7 @@ Finder.prototype.insert = function(node) {
 };
 
 Finder.prototype.create = function(type) {
-    var node = $('<div class="icon highlighted"><textarea name="node" class="autosize"></textarea></div>');
+    var node = $('<div class="icon highlighted"><textarea name="node" class="autosize" data-new="true"></textarea></div>');
     node.attr('data-capture-enter', 'true');
     if (type === 'directory') {
         node.addClass('documents');
@@ -484,23 +506,30 @@ Finder.prototype.textarea_handler = function(e) {
         var path = filesystem.absolute_path(this.pointer);
         if (!target.val().length) {
             target.parent().remove();
-        } else if (target.parent().hasClass('documents')) {
-            try {
-                filesystem.instance.mkdir(path + '/' + target.val());
-                this.refresh();
-            } catch (e) {
-                target.parent().remove();
-                util.alert(e.message);
+        } else if (target.attr('data-new') === 'true') {
+            if (target.parent().hasClass('documents')) {
+                try {
+                    filesystem.instance.mkdir(path + '/' + target.val());
+                } catch (e) {
+                    target.parent().remove();
+                    util.alert(e.message);
+                }
+            } else if (target.parent().hasClass('sublimetext')) {
+                if (this.pointer.find(target.val()).length) {
+                    target.parent().remove();
+                    util.alert('Name already taken: ' + target.val());
+                } else {
+                    filesystem.instance.cat('>', path + '/' + target.val(), '');
+                }
             }
-        } else if (target.parent().hasClass('sublimetext')) {
+        } else {
             try {
-                filesystem.instance.cat('>', path + '/' + target.val(), '');
-                this.refresh();
+                filesystem.instance.rn(target.attr('data-new'), target.val());
             } catch (e) {
-                target.parent().remove();
                 util.alert(e.message);
             }
         }
+        this.refresh();
     }
 };
 
@@ -510,6 +539,12 @@ Finder.prototype.icons_handler = function(e) {
         this.location(filesystem.resolve_path(target.data('path')));
     } else if (target.hasClass('sublimetext')) {
         windows.spawn('textedit', target.data('path'));
+    } else if (e.type === 'click') {
+        system.contextmenu.addClass('hidden');
+        var target = system.contextmenu_target;
+        var node = filesystem.resolve_path(target.data('path'));
+        target.html('<textarea name="node" class="autosize" data-new="' + filesystem.absolute_path(node) + '">' + node.key + '</textarea>');
+        target.addClass('highlighted').find('textarea').trigger('focus');
     }
 };
 
