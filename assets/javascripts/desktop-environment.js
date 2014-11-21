@@ -2,7 +2,7 @@ $(document).ready(function() {
     filesystem.initialize();
     components.initialize();
     windows.initialize();
-    clipboard.initialize();
+    system.initialize();
 });
 
 var filesystem = {
@@ -221,28 +221,45 @@ var windows = {
     }
 };
 
-var clipboard = {
-    cache: [],
-    operation: null,
-    operations: { 67: 'cp', 88: 'mv' },
+var system = {
+    clipboard: [],
+    clipboard_sources: [],
+    clipboard_operation: null,
+    clipboard_operations: { 67: 'cp', 88: 'mv' },
     initialize: function() {
         $(document).on('keyup', function(e) {
-            if (e.keyCode === 67 || e.keyCode === 88) {
-                clipboard.cache = [];
-                clipboard.operation = clipboard.operations[e.keyCode];
-                $('.window .icon.highlighted').each(function() {
-                    clipboard.cache.push($(this).data('path'));
-                });
+            if (e.keyCode === 67 || e.keyCode === 88 || e.keyCode === 86) {
+                system.invoke_clipboard(e.keyCode);
             } else if (e.keyCode === 86) {
-                var target = windows.instance($('.window.focused'));
-                if (target && target instanceof Finder) {
-                    for (var i = 0; i < clipboard.cache.length; i++) {
-                        filesystem.instance[clipboard.operation](clipboard.cache[i], target.pointer);
-                    }
-                    target.refresh();
-                }
+                
             }
         });
+    },
+    invoke_clipboard: function(code) {
+        if (code === 67 || code === 88) {
+            system.clipboard = [];
+            system.clipboard_operation = system.clipboard_operations[code];
+            $('.window .icon.highlighted').each(function() {
+                system.clipboard.push($(this).data('path'));
+                var parent = windows.instance($(this).closest('.window'));
+                if (system.clipboard_sources.indexOf(parent) < 0) {
+                    system.clipboard_sources.push(parent);
+                }
+            });
+        } else {
+            var target = windows.instance($('.window.focused'));
+            if (target && target instanceof Finder) {
+                for (var i = 0; i < system.clipboard.length; i++) {
+                    filesystem.instance[system.clipboard_operation](system.clipboard[i], target.pointer);
+                }
+                target.refresh();
+                for (var i = 0; i < system.clipboard_sources.length; i++) {
+                    system.clipboard_sources[i].refresh();
+                }
+                system.clipboard = [];
+                system.clipboard_sources = [];
+            }
+        }
     }
 };
 
@@ -361,10 +378,6 @@ function Finder(pointer) {
 }
 Window.extend(Finder);
 
-Finder.prototype.focus = function() {
-    this.refresh();
-};
-
 Finder.prototype.maximize = function() {
     if (!this.dom.hasClass('maximize')) {
         this.dom.animate({
@@ -393,6 +406,7 @@ Finder.prototype.navigate = function(direction) {
     } else if (direction === 'forward') {
         this.pointer = this.history[++this.cursor];
     }
+    this.refresh();
 };
 
 Finder.prototype.refresh = function() {
