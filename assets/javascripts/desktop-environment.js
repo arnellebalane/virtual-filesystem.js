@@ -84,11 +84,10 @@ var components = {
             } else if (e.keyCode === 13 && $(this).attr('data-capture-enter') === 'true') {
                 e.preventDefault();
                 target.textarea_handler(e);
-            } else if (e.ctrlKey && (e.keyCode === 76 || e.keyCode === 68)) {
+            } else if (e.ctrlKey && (e.keyCode === 76 || e.keyCode === 68 || e.keyCode === 83)) {
                 e.preventDefault();
                 target.keyboard_handler(e);
-            } else if (e.ctrlKey && e.keyCode === 83) {
-                e.preventDefault();
+            } else if (e.keyCode === 27) {
                 target.keyboard_handler(e);
             } else if ($(this).hasClass('autosize')) {
                 target.textarea_handler(e);
@@ -461,6 +460,13 @@ Finder.prototype.create = function(type) {
     setTimeout(function() {
         node.find('textarea').trigger('focus');
     }, 0);
+};
+
+Finder.prototype.keyboard_handler = function(e) {
+    var target = $(e.target);
+    if (e.keyCode === 27) {
+        target.trigger('blur');
+    }
 };
 
 Finder.prototype.textarea_handler = function(e) {
