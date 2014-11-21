@@ -85,6 +85,21 @@
                 </main>
             </section>
         </template>
+        <template id="filebrowser">
+            <section class="window filebrowser focused" data-title="">
+                <header>
+                    <span class="action close"></span>
+                </header>
+                <main>
+                    <ul></ul>
+                    <div class="file-info clearfix">
+                        <label>Filename:</label>
+                        <input type="text" name="filename">
+                        <span class="action-button" data-icon="check"></span>
+                    </div>
+                </main>
+            </section>
+        </template>
 
         <script src="bower_components/jquery/dist/jquery.js"></script>
         <script src="assets/javascripts/generic-tree.js"></script>

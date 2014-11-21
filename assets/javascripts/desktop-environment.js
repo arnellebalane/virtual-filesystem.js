@@ -227,6 +227,9 @@ var applications = {
     },
     textedit: function(path) {
         return new TextEdit(path ? filesystem.resolve_path(path) : path);
+    },
+    filebrowser: function(path) {
+        return new FileBrowser(filesystem.resolve_path(path));
     }
 };
 
@@ -234,6 +237,7 @@ var templates = {
     finder: $('template#finder').html(),
     terminal: $('template#terminal').html(),
     textedit: $('template#textedit').html(),
+    filebrowser: $('template#filebroser').html(),
     alert: $('template#alert').html()
 };
 
@@ -245,7 +249,7 @@ var util = {
     },
     alert: function(message) {
         var template = $(templates.alert);
-        var overlay = $('<div class="alert-overlay"></div>');
+        var overlay = $('<div class="overlay"></div>');
         template.find('p').text(message);
         windows.desktop.append(overlay);
         windows.desktop.append(template);
@@ -713,6 +717,28 @@ TextEdit.prototype.keyboard_handler = function(e) {
         } else {
             var path = filesystem.absolute_path(this.pointer);
             filesystem.instance.cat('>', path, this.dom.find('textarea').val());
+        }
+    }
+};
+
+function FileBrowser(pointer) {
+    this.dom = $(templates.filebrowser);
+    this.pointer = null;
+
+    this.location(pointer);
+}
+Window.extend(FileBrowser);
+
+FileBrowser.prototype.location = function(location) {
+    this.pointer = location;
+    var list = this.dom.find('ul').empty();
+    if (this.pointer !== filesystem.instance.tree.root) {
+        list.append('<div class="icon list">' + (up one directory) + '</div>');
+    }
+    for (var i = 0; i < this.pointer.children.length; i++) {
+        var child = this.pointer.children[i];
+        if (child.type === 'directory') {
+            list.append('<div class="icon list">' + child.key + '</div>');
         }
     }
 };

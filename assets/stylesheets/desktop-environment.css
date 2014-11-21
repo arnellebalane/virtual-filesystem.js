@@ -31,6 +31,29 @@ html {
 
 
 
+/** BASE ELEMENT STYLES **/
+input {
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+    width: 28px;
+    height: 22px;
+    font: normal 1.2rem "Consolas", monospace;
+    color: #999999;
+    background-color: #ffffff;
+    border: none;
+    border-radius: 3px;
+    padding: 0 5px;
+    box-shadow: 0 1px 1px rgba(40, 40, 40, 0.25);
+    outline: none;
+}
+
+input:focus {
+    color: #333333;
+}
+
+
+
 /** UTILITY CLASSES **/
 .hidden {
     display: none;
@@ -38,6 +61,12 @@ html {
 
 .error {
     box-shadow: 0 0 2px 2px rgba(255, 95, 80, 0.4) !important;
+}
+
+.clearfix:after {
+    content: "";
+    display: block;
+    clear: both;
 }
 
 
@@ -122,26 +151,6 @@ html {
     margin: 30px 0 0 -10px;
     background-color: #eeeeee;
     box-shadow: 0 1px 0 rgba(14, 14, 14, 0.3);
-}
-
-.finder input {
-    position: relative;
-    display: inline-block;
-    vertical-align: top;
-    width: 28px;
-    height: 22px;
-    font: normal 1.2rem "Consolas", monospace;
-    color: #999999;
-    background-color: #ffffff;
-    border: none;
-    border-radius: 3px;
-    padding: 0 5px;
-    box-shadow: 0 1px 1px rgba(40, 40, 40, 0.25);
-    outline: none;
-}
-
-.finder input:focus {
-    color: #333333;
 }
 
 .finder input[name="path"] {
@@ -294,7 +303,7 @@ html {
     resize: none;
 }
 
-.alert-overlay {
+.overlay {
     position: absolute;
     top: 0;
     left: 0;
@@ -338,6 +347,47 @@ html {
     color: #222222;
 }
 
+.filebrowser {
+    width: 400px;
+    height: 250px;
+}
+
+.filebrowser ul {
+    height: calc(100% - 32px);
+    padding: 10px 0;
+    overflow: auto;
+}
+
+.filebrowser .file-info {
+    padding: 5px 10px;
+    background-color: #eeeeee;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+    box-shadow: 0 -1px 0 rgba(14, 14, 14, 0.3);
+}
+
+.filebrowser label {
+    float: left;
+    font-size: 1.2rem;
+    line-height: 2.2rem;
+    color: #333333;
+    margin-right: 5px;
+}
+
+.filebrowser input {
+    float: left;
+    width: 286px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    margin-right: 1px;
+}
+
+.filebrowser .action-button {
+    float: left;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
 
 
 /** COMPONENTS STYLES **/
@@ -349,6 +399,8 @@ html {
     font-size: 1.2rem;
     text-align: center;
     line-height: 1;
+    white-space: pre-wrap;
+    word-break: break-word;
     color: #222222;
     background: none;
     border-radius: 3px;
@@ -370,9 +422,26 @@ html {
     box-sizing: content-box;
 }
 
+.icon.list {
+    display: block;
+    width: 100%;
+    text-align: left;
+    margin: 1px 0;
+    border-radius: 0;
+    padding: 4px 10px 2px 10px;
+}
+
+.icon.list:nth-of-type(2n) {
+    background-color: #eeeeee;
+}
+
+.icon.list:before {
+    display: none;
+}
+
 .icon.highlighted {
-    color: #ffffff;
-    background-color: rgba(119, 170, 219, 1);
+    color: #ffffff !important;
+    background-color: rgba(119, 170, 219, 1) !important;
 }
 
 .icon.launchpad:before {
@@ -460,6 +529,11 @@ html {
 
 .action-button[data-icon="file"]:before {
     background-image: url("../images/file.png");
+    background-size: 60% auto;
+}
+
+.action-button[data-icon="check"]:before {
+    background-image: url("../images/check.png");
     background-size: 60% auto;
 }
 
