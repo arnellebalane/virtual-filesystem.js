@@ -91,7 +91,7 @@
         };
 
         this.search = function(key) {
-            var results = this.key === key ? [this] : [];
+            var results = this.key.match('^' + key.replace(/\./g, '\\.').replace(/\*/g, '\.\*') + '$') ? [this] : [];
             for (var i in this.children) {
                 results = results.concat(this.children[i].search(key));
             }
