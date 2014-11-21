@@ -520,9 +520,25 @@ Finder.prototype.huds_handler = function(e) {
         } catch (e) {
             target.addClass('error').trigger('focus');
         }
-    } else if (target.is('.action-button.folder')) {
+    } else if (target.is('[name="search"]')) {
+        var results = filesystem.instance.whereis(target.val());
+        this.dom.find('main').empty();
+        for (var i = 0; i < results.length; i++) {
+            this.cursor++;
+            this.dom.find('.action-bar .action-button').addClass('disabled');
+            this.dom.find('.action-bar .action-button.back').removeClass('disabled');
+            var node = results[i];
+            var result = $('<div class="icon" data-path="' + filesystem.absolute_path(node) + '">' + node.key + '</div>');
+            if (node.type === 'directory') {
+                result.addClass('documents');
+            } else if (node.type === 'file') {
+                result.addClass('sublimetext');
+            }
+            this.dom.find('main').append(result);
+        }
+    } else if (target.is('.action-button.folder') && !target.hasClass('disabled')) {
         this.create('directory');
-    } else if (target.is('.action-button.file')) {
+    } else if (target.is('.action-button.file') && !target.hasClass('disabled')) {
         this.create('file');
     }
 };
