@@ -603,6 +603,9 @@ Finder.prototype.huds_handler = function(e) {
             }
             this.dom.find('main').append(result);
         }
+        if (!results.length) {
+            this.dom.find('main').append('<p>No results found.</p>');
+        }
     } else if (target.is('.action-button.folder') && !target.hasClass('disabled')) {
         this.create('directory');
     } else if (target.is('.action-button.file') && !target.hasClass('disabled')) {

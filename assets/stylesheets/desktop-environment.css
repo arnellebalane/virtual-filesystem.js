@@ -208,6 +208,13 @@ input:focus {
     width: calc(100% - 200px);
 }
 
+.finder main p {
+    font-size: 1.2rem;
+    text-align: center;
+    color: #777777;
+    margin-top: 15px;
+}
+
 .terminal {
     top: calc(100% - 400px);
     left: calc(100% - 600px);
