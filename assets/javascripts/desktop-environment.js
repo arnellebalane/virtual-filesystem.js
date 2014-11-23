@@ -286,12 +286,14 @@ var system = {
     },
     invoke_deletion: function() {
         $('.window .icon.highlighted').each(function() {
+            var target = windows.instance($(this).closest('.window'));
             if ($(this).hasClass('documents')) {
                 filesystem.instance.rmdir($(this).data('path'));
             } else if ($(this).hasClass('sublimetext')) {
                 filesystem.instance.rm($(this).data('path'));
             }
             $(this).remove();
+            target.refresh();
         });
     },
     invoke_contextmenu: function(e) {
@@ -421,8 +423,6 @@ function Finder(pointer) {
 }
 Window.extend(Finder);
 
-// favorites in finder sidebar. transfer this
-// to a better location later
 Window.favorites = [];
 
 Finder.prototype.maximize = function() {
