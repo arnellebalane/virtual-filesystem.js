@@ -722,6 +722,9 @@ function Terminal(pointer) {
     };
 
     this.location(this.pointer);
+
+    // make clicks on the terminal window focus on the textarea
+    this.dom.on('click', this.focus.bind(this));
 }
 Window.extend(Terminal);
 
