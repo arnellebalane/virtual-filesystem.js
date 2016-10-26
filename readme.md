@@ -1,4 +1,10 @@
-virtual-filesystem
-==================
+# Virtual Filesystem
 
-yosemite-themed desktop environment in the browser
+Yosemite-themed desktop environment in the browser.
+
+![screenshot](screenshot.png)
+
+
+## License
+
+MIT License
